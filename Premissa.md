@@ -18,6 +18,3 @@ Explore cenários repletos de detalhes, colete pistas e conecte informações pa
 
 Combine itens, decifre enigmas e encontre soluções criativas para avançar. Observe atentamente o ambiente, pois até os menores detalhes podem esconder a chave para o próximo passo.
 
-### UMA AVENTURA CHEIA DE HUMOR
-
-Conheça personagens excêntricos, participe de diálogos divertidos e enfrente situações absurdas enquanto tenta manter seu disfarce. Entre momentos cômicos e revelações inesperadas, cada descoberta o aproxima da verdade sobre o destino da humanidade.
