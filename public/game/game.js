@@ -1,3 +1,5 @@
+import { getDialogue } from "./data/dialogues.js";
+
 const scenes = {
     beach: {
         hasHuman: false,
@@ -576,122 +578,37 @@ function closeDialogue() {
     document.getElementById("game").classList.remove("dialogue-active");
 }
 
+async function playDialogueSteps(steps) {
+    for (const step of steps) {
+        if (step.type === "lines") {
+            await new Promise(resolve => showDialogue(step.lines, resolve, step.speaker));
+            continue;
+        }
+
+        if (step.type === "choice") {
+            await new Promise(resolve => {
+                showChoiceDialogue(step.question || "", step.choices.map(choice => ({
+                    label: choice.label,
+                    action: async () => {
+                        if (choice.steps) await playDialogueSteps(choice.steps);
+                        if (choice.action === "receiveBlindfold") receiveBlindfold();
+                        resolve();
+                    }
+                })), step.speaker);
+            });
+        }
+    }
+}
+
 function examineComputer() {
     if (computerExamined) {
-        showDialogue(
-            ["Já te falei tudo que sei. Agora vai!"],
-            null,
-            "MÁQUINA DESTRUIDA"
-        );
+        const dialogue = getDialogue("computerAlreadyExamined");
+        showDialogue(dialogue.lines, null, dialogue.speaker);
         return;
     }
 
     computerExamined = true;
-
-    // Máquina chama o MEE
-    showDialogue(
-        ["Ei, psiu! Você aí! O que tá fazendo andando por aí descoberto?!"],
-        () => {
-            showDialogue(
-                [
-                    "Descoberto? Como assim?",
-                    "Por quanto tempo eu estive dormindo?"
-                ],
-                () => {
-                    showDialogue(
-                        ["Rápido, se esconda! Não temos muito tempo!"],
-                        () => {
-                            showChoiceDialogue(
-                                "",
-                                [
-                                    {
-                                        label: "Se esconder",
-                                        action: () => {
-                                            showDialogue(
-                                                [
-                                                    "Porque estamos nos escondendo?",
-                                                    "Só estou à procura de um humano para ser meu usuário primário!"
-                                                ],
-                                                () => {
-                                                    showDialogue(
-                                                        ["Humano? HAHAHA! Tá querendo virar sucata?"],
-                                                        () => {
-                                                            showDialogue(
-                                                                [
-                                                                    "Sucata?",
-                                                                    "Eu não deveria nem ter sido ativado sem a presença de um usuário.",
-                                                                    "Minha missão é me tornar o ajudante perfeito!",
-                                                                    "O melhor amigo da humanidade!"
-                                                                ],
-                                                                () => {
-                                                                    showDialogue(
-                                                                        [
-                                                                            "Macacos me mordam! Ou você está completamente bugado ou não está sabendo de nada."
-                                                                        ],
-                                                                        () => {
-                                                                            showDialogue(
-                                                                                ["…"],
-                                                                                () => {
-                                                                                    showDialogue(
-                                                                                        [
-                                                                                            "Depois do que chamam de O Arrebatamento, os humanos começaram a ter medo de tudo que envolve tecnologia.",
-                                                                                            "Máquinas como você? Eles caçam, desmontam e destroem. Não importa se são perigosas ou não.",
-                                                                                            "Então, se pretende continuar funcionando, é melhor aprender a se esconder.",
-                                                                                            "Espera... tenho uma coisa que pode ajudar.",
-                                                                                            "Essa venda tem um sistema de disfarce visual. Vai esconder algumas coisas que poderiam entregar sua identidade.",
-                                                                                            "Só não tira quando tiver humanos por perto, beleza? Não vou poder te ajudar se descobrirem você."
-                                                                                        ],
-                                                                                        () => {
-                                                                                            showDialogue(
-                                                                                                [
-                                                                                                    "Rápido! Coloque essa venda! Vai ser melhor pra sua segurança."
-                                                                                                ],
-                                                                                                () => {
-                                                                                                    showChoiceDialogue(
-                                                                                                        "",
-                                                                                                        [
-                                                                                                            {
-                                                                                                                label: "Colocar venda",
-                                                                                                                action: receiveBlindfold
-                                                                                                            }
-                                                                                                        ],
-                                                                                                        "" // Sem label
-                                                                                                    );
-                                                                                                },
-                                                                                                "MÁQUINA DESTRUIDA"
-                                                                                            );
-                                                                                        },
-                                                                                        "MÁQUINA DESTRUIDA"
-                                                                                    );
-                                                                                },
-                                                                                "MEE"
-                                                                            );
-                                                                        },
-                                                                        "MÁQUINA DESTRUIDA"
-                                                                    );
-                                                                },
-                                                                "MEE"
-                                                            );
-                                                        },
-                                                        "MÁQUINA DESTRUIDA"
-                                                    );
-                                                },
-                                                "MEE"
-                                            );
-                                        }
-                                    }
-                                ],
-                                "MEE"
-                            );
-                        },
-                        "MÁQUINA DESTRUIDA"
-                    );
-                },
-                "MEE"
-            );
-        },
-        "MÁQUINA DESTRUIDA"
-    );
+    playDialogueSteps(getDialogue("computerIntro").steps);
 }
 
 // RECEBER A VENDA
