@@ -1,3 +1,5 @@
+import { getDialogue } from "./data/dialogues.js";
+
 const scenes = {
     beach: {
         hasHuman: false,
@@ -576,7 +578,7 @@ function closeDialogue() {
     document.getElementById("game").classList.remove("dialogue-active");
 }
 
-function examineComputer() {
+function legacyExamineComputer() {
     if (computerExamined) {
         showDialogue(
             ["Já te falei tudo que sei. Agora vai!"],
@@ -694,7 +696,40 @@ function examineComputer() {
     );
 }
 
-// RECEBER A VENDA
+function runDialogueSteps(steps, onComplete = null) {
+    const [step, ...remaining] = steps;
+    if (!step) {
+        onComplete?.();
+        return;
+    }
+
+    if (step.type === "lines") {
+        showDialogue(step.lines, () => runDialogueSteps(remaining, onComplete), step.speaker);
+        return;
+    }
+
+    if (step.type === "choice") {
+        showChoiceDialogue("", step.choices.map(choice => ({
+            label: choice.label,
+            action: () => choice.steps
+                ? runDialogueSteps(choice.steps, () => runDialogueSteps(remaining, onComplete))
+                : window[choice.action]?.()
+        })), step.speaker);
+    }
+}
+
+function examineComputer() {
+    if (computerExamined) {
+        const dialogue = getDialogue("computerAlreadyExamined");
+        showDialogue(dialogue.lines, null, dialogue.speaker);
+        return;
+    }
+
+    computerExamined = true;
+    const dialogue = getDialogue("computerIntro");
+    runDialogueSteps(dialogue.steps);
+}
+
 // RECEBER A VENDA
 function receiveBlindfold() {
     hasBlindfold = true;
@@ -763,6 +798,8 @@ function restartGame() {
 
 
 // EVENTOS
+document.getElementById("blindfold-button").addEventListener("click", toggleBlindfold);
+document.getElementById("restart-button").addEventListener("click", restartGame);
 document.getElementById("start-button").addEventListener("click", () => {
     crtTransition(() => {
         startBoot();
