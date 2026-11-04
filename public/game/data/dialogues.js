@@ -1,4 +1,7 @@
-import dialogueData from './dialogues.json' with { type: 'json' }
+const dialogueData = await fetch('./dialogues.json').then((response) => {
+  if (!response.ok) throw new Error(`Falha ao carregar diálogos: ${response.status}`)
+  return response.json()
+})
 
 export const dialogues = Object.freeze(dialogueData)
 

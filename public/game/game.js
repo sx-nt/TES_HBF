@@ -679,6 +679,10 @@ function restartGame() {
 }
 
 
+// API mínima para a camada HTML e para futuras telas de menu.
+window.startBoot = startBoot;
+window.startGame = startGame;
+
 // EVENTOS
 document.getElementById("start-button").addEventListener("click", () => {
     crtTransition(() => {
