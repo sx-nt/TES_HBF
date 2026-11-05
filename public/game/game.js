@@ -14,6 +14,13 @@ const scenes = {
                 width: 17,
                 height: 34,
                 action: examineComputer
+            },
+            {
+                x: 47,
+                y: 58,
+                width: 24,
+                height: 36,
+                action: examineDebris
             }
         ]
     },
@@ -21,8 +28,17 @@ const scenes = {
     gates: {
         hasHuman: true,
         images: {
-            blindfolded: "assets/maps/C_Venda/gates_officer.png",
-            unblindfolded: "assets/maps/C_Venda/gates_sem_venda.png"
+            blindfolded: "assets/maps/C_Venda/gates_com_venda.png",
+            unblindfolded: "assets/maps/C_Venda/gates_com_venda.png"
+        },
+        hotspots: []
+    },
+
+    houseFront: {
+        hasHuman: true,
+        images: {
+            blindfolded: "assets/maps/C_Venda/frente_casa_com_venda.png",
+            unblindfolded: "assets/maps/C_Venda/frente_casa_com_venda.png"
         },
         hotspots: []
     },
@@ -71,6 +87,9 @@ let currentScene = null;
 let hasBlindfold = false;
 let blindfoldOn = false;
 let computerExamined = false;
+let debrisExamined = false;
+let inventory = [];
+let gatesReady = false;
 let bootInterval = null;
 
 
@@ -221,6 +240,11 @@ function startGame() {
     hasBlindfold = false;
     blindfoldOn = false;
     computerExamined = false;
+    debrisExamined = false;
+    inventory = [];
+    gatesReady = false;
+    updateInventory();
+    document.getElementById("officer-overlay").classList.add("hidden");
 
     loadScene("beach");
 }
@@ -309,14 +333,18 @@ function updateSceneActions() {
 
     actions.innerHTML = "";
 
-    if (currentScene === "beach" && hasBlindfold) {
-        addAction("Ir para os portões", goToGates);
+    if (currentScene === "beach") {
+        if (!debrisExamined) addAction("Examinar destroços", examineDebris);
+        if (debrisExamined && !inventory.includes("madeira")) addAction("Coletar madeira", collectWood);
+        if (hasBlindfold) addAction("Ir para os portões", goToGates);
     }
 
-    if (currentScene === "gates") {
-        addAction("Entrar no assentamento", () => {
-            loadScene("quarto");
-        });
+    if (currentScene === "gates" && gatesReady) {
+        addAction("Seguir Officer Gates", () => loadScene("houseFront"));
+    }
+
+    if (currentScene === "houseFront") {
+        addAction("Entrar na casa", () => loadScene("quarto"));
     }
 
     if (currentScene === "quarto") {
@@ -362,6 +390,44 @@ function addAction(label, callback) {
     document.getElementById("scene-actions").appendChild(button);
 }
 
+
+function updateInventory() {
+    const inventoryEl = document.getElementById("inventory");
+    const itemsEl = document.getElementById("inventory-items");
+    if (!inventoryEl || !itemsEl) return;
+    inventoryEl.classList.toggle("hidden", inventory.length === 0);
+    itemsEl.textContent = inventory.map(item => item === "madeira" ? "MADEIRA" : item.toUpperCase()).join(" • ");
+}
+
+function examineDebris() {
+    if (debrisExamined) return;
+    debrisExamined = true;
+    const dialogue = getDialogue("debrisFound");
+    showDialogue(dialogue.lines, () => updateSceneActions(), dialogue.speaker);
+}
+
+function collectWood() {
+    if (!debrisExamined || inventory.includes("madeira")) return;
+    inventory.push("madeira");
+    updateInventory();
+    updateSceneActions();
+}
+
+function startGatesSequence() {
+    if (gatesReady) return;
+    const incoming = getDialogue("incomingPeople");
+    const officer = getDialogue("officerWelcome");
+    showDialogue(incoming.lines, () => {
+        loadScene("houseFront", () => {
+            document.getElementById("officer-overlay").classList.remove("hidden");
+            showDialogue(officer.lines, () => {
+                document.getElementById("officer-overlay").classList.add("hidden");
+                gatesReady = true;
+                updateSceneActions();
+            }, officer.speaker);
+        });
+    }, incoming.speaker);
+}
 
 // MECÂNICA DA VENDA
 
@@ -649,7 +715,7 @@ function goToGates() {
         return;
     }
 
-    loadScene("gates");
+    loadScene("gates", startGatesSequence);
 }
 
 
@@ -666,6 +732,10 @@ function restartGame() {
     hasBlindfold = false;
     blindfoldOn = false;
     computerExamined = false;
+    debrisExamined = false;
+    inventory = [];
+    gatesReady = false;
+    updateInventory();
 
     if (bootInterval !== null) {
         clearInterval(bootInterval);

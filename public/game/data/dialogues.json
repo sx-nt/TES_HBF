@@ -1,4 +1,16 @@
 {
+  "debrisFound": {
+    "speaker": "MEE",
+    "lines": ["Esses destroços ainda podem ser úteis.", "Consegui separar um pedaço de madeira."]
+  },
+  "incomingPeople": {
+    "speaker": "MEE SYSTEM",
+    "lines": ["ALERTA: pessoas se aproximando.", "Mantenha a venda e não faça movimentos suspeitos."]
+  },
+  "officerWelcome": {
+    "speaker": "OFFICER GATES",
+    "lines": ["Bem-vindo à cidade.", "Siga-me. Vou levar você até a sua casa."]
+  },
   "computerAlreadyExamined": {
     "speaker": "MÁQUINA DESTRUIDA",
     "lines": ["Já te falei tudo que sei. Agora vai!"]

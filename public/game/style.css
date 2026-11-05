@@ -107,6 +107,41 @@ button:hover {
     left: 25px;
     display: flex;
     gap: 10px;
+    flex-wrap: wrap;
+}
+
+#inventory {
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    z-index: 8;
+    padding: 10px 14px;
+    background: rgba(10, 10, 10, 0.86);
+    border: 1px solid #777;
+    color: #d8d8d8;
+    font-size: 12px;
+}
+
+#inventory span {
+    color: #bd9c9c;
+    margin-right: 10px;
+}
+
+#officer-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    pointer-events: none;
+}
+
+#officer-overlay img {
+    width: min(42vw, 520px);
+    max-height: 88vh;
+    object-fit: contain;
+    image-rendering: pixelated;
 }
 
 /* BOOT E GAME OVER */
