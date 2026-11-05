@@ -628,8 +628,8 @@ function receiveBlindfold() {
                 showDialogue([
                     "Venda equipada.",
                     "Use o botão no canto direito inferior para colocar ou retirar a venda.",
-                    "Quando equipada, as aparências já não são mais as mesmas",
-                    "Quando a removida, seus segredos não podem mais ser mantidos ...",
+                    "Quando equipada, as aparências já não são mais as mesmas...",
+                    "Quando removida, seus segredos não podem mais ser mantidos ...",
                     "CUIDADO: Nunca remova a venda perto de humanos!",
                 ], null, "MEE SYSTEM");
             },

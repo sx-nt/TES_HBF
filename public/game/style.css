@@ -153,6 +153,7 @@ button:hover {
     height: 8px;
     background: #332929;
     margin-top: 10px;
+    margin-bottom: 5%;
 }
 
 #progress {
