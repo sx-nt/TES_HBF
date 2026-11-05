@@ -29,7 +29,7 @@ const scenes = {
         hasHuman: true,
         images: {
             blindfolded: "assets/maps/C_Venda/gates_com_venda.png",
-            unblindfolded: "assets/maps/C_Venda/gates_com_venda.png"
+            unblindfolded: "assets/maps/C_Venda/gates_officer.png"
         },
         hotspots: []
     },
@@ -90,6 +90,9 @@ let computerExamined = false;
 let debrisExamined = false;
 let inventory = [];
 let gatesReady = false;
+let debrisHitboxes = [];
+let battery = 100;
+let isPaused = false;
 let bootInterval = null;
 
 
@@ -243,7 +246,13 @@ function startGame() {
     debrisExamined = false;
     inventory = [];
     gatesReady = false;
+    debrisHitboxes = [];
+    battery = 100;
+    isPaused = false;
     updateInventory();
+    updateBattery();
+    document.getElementById("top-hud").classList.remove("hidden");
+    document.getElementById("pause-menu").classList.add("hidden");
     document.getElementById("officer-overlay").classList.add("hidden");
 
     loadScene("beach");
@@ -274,6 +283,7 @@ function loadScene(sceneName, onLoaded = null) {
 
             document.getElementById("scene").classList.remove("hidden");
             document.getElementById("interface").classList.remove("hidden");
+            document.getElementById("game").classList.toggle("blindfold-active", blindfoldOn);
 
             createHotspots(scene.hotspots || []);
             updateInterface();
@@ -334,8 +344,12 @@ function updateSceneActions() {
     actions.innerHTML = "";
 
     if (currentScene === "beach") {
-        if (!debrisExamined) addAction("Examinar destroços", examineDebris);
-        if (debrisExamined && !inventory.includes("madeira")) addAction("Coletar madeira", collectWood);
+        if (!debrisExamined) {
+            addAction("Examinar destroços", examineDebris);
+        } else if (!inventory.includes("madeira")) {
+            addAction("Coletar madeira", collectWood);
+            createDebrisHitboxes();
+        }
         if (hasBlindfold) addAction("Ir para os portões", goToGates);
     }
 
@@ -395,21 +409,78 @@ function updateInventory() {
     const inventoryEl = document.getElementById("inventory");
     const itemsEl = document.getElementById("inventory-items");
     if (!inventoryEl || !itemsEl) return;
-    inventoryEl.classList.toggle("hidden", inventory.length === 0);
-    itemsEl.textContent = inventory.map(item => item === "madeira" ? "MADEIRA" : item.toUpperCase()).join(" • ");
+    itemsEl.textContent = inventory.length
+        ? inventory.map(item => item === "madeira" ? "MADEIRA" : item.toUpperCase()).join(" • ")
+        : "Vazio";
+}
+
+function updateBattery() {
+    const level = document.getElementById("battery-level");
+    const value = document.getElementById("battery-value");
+    if (!level || !value) return;
+    level.style.width = `${battery}%`;
+    value.textContent = `${battery}%`;
+}
+
+function toggleInventory() {
+    const panel = document.getElementById("inventory");
+    const button = document.getElementById("inventory-toggle");
+    const isOpen = !panel.classList.contains("hidden");
+    panel.classList.toggle("hidden", isOpen);
+    button.setAttribute("aria-expanded", String(!isOpen));
+}
+
+function togglePause() {
+    isPaused = !isPaused;
+    document.getElementById("pause-menu").classList.toggle("hidden", !isPaused);
+    document.getElementById("pause-button").setAttribute("aria-expanded", String(isPaused));
+    document.getElementById("game").classList.toggle("paused", isPaused);
 }
 
 function examineDebris() {
     if (debrisExamined) return;
-    debrisExamined = true;
-    const dialogue = getDialogue("debrisFound");
-    showDialogue(dialogue.lines, () => updateSceneActions(), dialogue.speaker);
+    computerExamined = true;
+    const dialogue = getDialogue("computerIntro");
+    playDialogueSteps(dialogue.steps).then(() => {
+        debrisExamined = true;
+        updateSceneActions();
+    });
+}
+
+function createDebrisHitboxes() {
+    const container = document.getElementById("hotspots");
+    debrisHitboxes.forEach(hitbox => hitbox.remove());
+    debrisHitboxes = [];
+
+    const positions = [
+        { x: 12, y: 24, width: 9, height: 13 },
+        { x: 66, y: 30, width: 8, height: 12 },
+        { x: 78, y: 68, width: 10, height: 12 }
+    ];
+
+    positions.forEach(position => {
+        const hitbox = document.createElement("button");
+        hitbox.className = "debris-hitbox";
+        hitbox.type = "button";
+        hitbox.setAttribute("aria-label", "Ponto de madeira nos destroços");
+        hitbox.style.left = `${position.x + Math.random() * 8}%`;
+        hitbox.style.top = `${position.y + Math.random() * 8}%`;
+        hitbox.style.width = `${position.width}%`;
+        hitbox.style.height = `${position.height}%`;
+        hitbox.addEventListener("click", collectWood);
+        container.appendChild(hitbox);
+        debrisHitboxes.push(hitbox);
+    });
 }
 
 function collectWood() {
     if (!debrisExamined || inventory.includes("madeira")) return;
     inventory.push("madeira");
+    battery = Math.max(0, battery - 5);
+    debrisHitboxes.forEach(hitbox => hitbox.remove());
+    debrisHitboxes = [];
     updateInventory();
+    updateBattery();
     updateSceneActions();
 }
 
@@ -418,12 +489,14 @@ function startGatesSequence() {
     const incoming = getDialogue("incomingPeople");
     const officer = getDialogue("officerWelcome");
     showDialogue(incoming.lines, () => {
-        loadScene("houseFront", () => {
+        loadScene("gates", () => {
+            const gatesBackground = document.getElementById("background");
+            gatesBackground.src = "assets/maps/C_Venda/gates_officer.png";
             document.getElementById("officer-overlay").classList.remove("hidden");
             showDialogue(officer.lines, () => {
                 document.getElementById("officer-overlay").classList.add("hidden");
                 gatesReady = true;
-                updateSceneActions();
+                loadScene("houseFront");
             }, officer.speaker);
         });
     }, incoming.speaker);
@@ -735,7 +808,13 @@ function restartGame() {
     debrisExamined = false;
     inventory = [];
     gatesReady = false;
+    debrisHitboxes = [];
+    battery = 100;
+    isPaused = false;
+    document.getElementById("top-hud").classList.add("hidden");
+    document.getElementById("pause-menu").classList.add("hidden");
     updateInventory();
+    updateBattery();
 
     if (bootInterval !== null) {
         clearInterval(bootInterval);
@@ -758,4 +837,12 @@ document.getElementById("start-button").addEventListener("click", () => {
     crtTransition(() => {
         startBoot();
     });
+});
+
+document.getElementById("inventory-toggle").addEventListener("click", toggleInventory);
+document.getElementById("pause-button").addEventListener("click", togglePause);
+document.getElementById("resume-button").addEventListener("click", togglePause);
+document.getElementById("pause-restart-button").addEventListener("click", () => {
+    togglePause();
+    restartGame();
 });

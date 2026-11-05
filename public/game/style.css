@@ -211,17 +211,19 @@ button:hover {
 
 #dialogue {
     position: absolute;
-    bottom: 4%;
-    left: 5%;
-    width: 90%;
-    min-height: 150px;
-    padding: 22px;
-    background: rgba(10, 10, 10, 0.95);
+    bottom: 0;
+    left: 2.5%;
+    width: 95%;
+    min-height: 118px;
+    max-height: 28vh;
+    padding: 14px 18px 12px;
+    background: rgba(10, 10, 10, 0.96);
     border: 1px solid #777;
-    z-index: 5;
+    z-index: 7;
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 8px;
+    overflow-y: auto;
 }
 
 #dialogue-speaker {
@@ -541,6 +543,122 @@ button:hover {
     color: #777;
     font-size: 10px;
     text-align: left;
+}
+
+#top-hud {
+    position: absolute;
+    top: 18px;
+    left: 18px;
+    right: 18px;
+    z-index: 12;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    pointer-events: none;
+}
+
+#top-hud > * { pointer-events: auto; }
+
+#top-hud button {
+    padding: 8px 12px;
+    font-size: 11px;
+}
+
+#battery-meter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+    padding: 7px 10px;
+    background: rgba(10, 10, 10, 0.86);
+    border: 1px solid #777;
+    font-size: 10px;
+}
+
+.battery-track {
+    width: 92px;
+    height: 9px;
+    border: 1px solid #aaa;
+    background: #201b1b;
+}
+
+#battery-level {
+    width: 100%;
+    height: 100%;
+    background: #bd9c9c;
+    transition: width 0.25s ease, background 0.25s ease;
+}
+
+#battery-level[style*="width: 20%"], #battery-level[style*="width: 0%"] {
+    background: #a52d2d;
+}
+
+#inventory {
+    top: 62px;
+    left: 18px;
+    z-index: 13;
+    min-width: 170px;
+}
+
+#pause-menu {
+    position: absolute;
+    inset: 0;
+    z-index: 14;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 12px;
+    background: rgba(0, 0, 0, 0.78);
+}
+
+#pause-menu h2 {
+    color: #bd9c9c;
+    font-size: 20px;
+    margin-bottom: 8px;
+}
+
+#game.paused #scene,
+#game.paused #interface,
+#game.paused #dialogue {
+    filter: brightness(0.35);
+}
+
+#game.blindfold-active::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    background: rgba(0, 0, 0, 0.38);
+    transition: background 0.3s ease;
+}
+
+.debris-hitbox {
+    position: absolute;
+    padding: 0;
+    border: 1px solid rgba(189, 156, 156, 0.35);
+    background: rgba(189, 156, 156, 0.07);
+    animation: hitbox-pulse 1.4s ease-in-out infinite;
+}
+
+.debris-hitbox:hover,
+.debris-hitbox:focus-visible {
+    border-color: #bd9c9c;
+    background: rgba(189, 156, 156, 0.25);
+}
+
+@keyframes hitbox-pulse {
+    0%, 100% { opacity: 0.45; }
+    50% { opacity: 1; }
+}
+
+@media (max-width: 640px) {
+    #top-hud { top: 10px; left: 10px; right: 10px; }
+    #top-hud button { padding: 7px 8px; font-size: 9px; }
+    .battery-track { width: 58px; }
+    #battery-meter span { display: none; }
+    #dialogue { left: 2%; width: 96%; max-height: 34vh; }
 }
 
 /* Bloqueia os cliques no cenário durante os diálogos */

@@ -52,10 +52,26 @@
         <div id="hotspots"></div>
     </div>
 
-    <div id="inventory" class="hidden" aria-live="polite">
-        <span>INVENTÁRIO</span>
-        <div id="inventory-items"></div>
+    <div id="top-hud" class="hidden" aria-label="Controles do jogo">
+        <button id="inventory-toggle" type="button" aria-expanded="false">Inventário</button>
+        <button id="pause-button" type="button" aria-expanded="false">Pausar</button>
+        <div id="battery-meter" role="status" aria-label="Bateria do MEE">
+            <span>BATERIA</span>
+            <div class="battery-track"><div id="battery-level"></div></div>
+            <strong id="battery-value">100%</strong>
+        </div>
     </div>
+
+    <aside id="inventory" class="hidden" aria-live="polite" aria-label="Inventário">
+        <span>INVENTÁRIO</span>
+        <div id="inventory-items">Vazio</div>
+    </aside>
+
+    <aside id="pause-menu" class="hidden" aria-label="Menu de pausa">
+        <h2>JOGO PAUSADO</h2>
+        <button id="resume-button" type="button">Continuar</button>
+        <button id="pause-restart-button" type="button">Reiniciar</button>
+    </aside>
 
     <div id="officer-overlay" class="hidden" aria-hidden="true">
         <img src="assets/overlay/officer_overlay.png" alt="Officer Gates" />
