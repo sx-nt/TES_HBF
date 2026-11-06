@@ -253,8 +253,6 @@ function startGame() {
     updateBattery();
     document.getElementById("top-hud").classList.remove("hidden");
     document.getElementById("pause-menu").classList.add("hidden");
-    document.getElementById("officer-overlay").classList.add("hidden");
-
     loadScene("beach");
 }
 
@@ -348,7 +346,6 @@ function updateSceneActions() {
             addAction("Examinar destroços", examineDebris);
         } else if (!inventory.includes("madeira")) {
             addAction("Coletar madeira", collectWood);
-            createDebrisHitboxes();
         }
         if (hasBlindfold) addAction("Ir para os portões", goToGates);
     }
@@ -447,32 +444,6 @@ function examineDebris() {
     });
 }
 
-function createDebrisHitboxes() {
-    const container = document.getElementById("hotspots");
-    debrisHitboxes.forEach(hitbox => hitbox.remove());
-    debrisHitboxes = [];
-
-    const positions = [
-        { x: 12, y: 24, width: 9, height: 13 },
-        { x: 66, y: 30, width: 8, height: 12 },
-        { x: 78, y: 68, width: 10, height: 12 }
-    ];
-
-    positions.forEach(position => {
-        const hitbox = document.createElement("button");
-        hitbox.className = "debris-hitbox";
-        hitbox.type = "button";
-        hitbox.setAttribute("aria-label", "Ponto de madeira nos destroços");
-        hitbox.style.left = `${position.x + Math.random() * 8}%`;
-        hitbox.style.top = `${position.y + Math.random() * 8}%`;
-        hitbox.style.width = `${position.width}%`;
-        hitbox.style.height = `${position.height}%`;
-        hitbox.addEventListener("click", collectWood);
-        container.appendChild(hitbox);
-        debrisHitboxes.push(hitbox);
-    });
-}
-
 function collectWood() {
     if (!debrisExamined || inventory.includes("madeira")) return;
     inventory.push("madeira");
@@ -492,9 +463,7 @@ function startGatesSequence() {
         loadScene("gates", () => {
             const gatesBackground = document.getElementById("background");
             gatesBackground.src = "assets/maps/C_Venda/gates_officer.png";
-            document.getElementById("officer-overlay").classList.remove("hidden");
             showDialogue(officer.lines, () => {
-                document.getElementById("officer-overlay").classList.add("hidden");
                 gatesReady = true;
                 loadScene("houseFront");
             }, officer.speaker);
@@ -839,6 +808,7 @@ document.getElementById("start-button").addEventListener("click", () => {
     });
 });
 
+document.getElementById("blindfold-button").addEventListener("click", toggleBlindfold);
 document.getElementById("inventory-toggle").addEventListener("click", toggleInventory);
 document.getElementById("pause-button").addEventListener("click", togglePause);
 document.getElementById("resume-button").addEventListener("click", togglePause);

@@ -48,7 +48,7 @@ button:hover {
 
 #scene {
     position: relative;
-    width: min(100vw, 300vh);
+    width: min(100vw, 260vh);
     aspect-ratio: 2048 / 682;
 }
 
@@ -127,22 +127,6 @@ button:hover {
     margin-right: 10px;
 }
 
-#officer-overlay {
-    position: absolute;
-    inset: 0;
-    z-index: 4;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    pointer-events: none;
-}
-
-#officer-overlay img {
-    width: min(42vw, 520px);
-    max-height: 88vh;
-    object-fit: contain;
-    image-rendering: pixelated;
-}
 
 /* BOOT E GAME OVER */
 
@@ -211,12 +195,12 @@ button:hover {
 
 #dialogue {
     position: absolute;
-    bottom: 0;
-    left: 2.5%;
-    width: 95%;
-    min-height: 118px;
-    max-height: 28vh;
-    padding: 14px 18px 12px;
+    bottom: 14px;
+    left: max(14px, 3vw);
+    width: calc(100% - max(28px, 6vw));
+    min-height: 104px;
+    max-height: 26vh;
+    padding: 14px 18px 16px;
     background: rgba(10, 10, 10, 0.96);
     border: 1px solid #777;
     z-index: 7;
@@ -634,31 +618,21 @@ button:hover {
     transition: background 0.3s ease;
 }
 
-.debris-hitbox {
-    position: absolute;
-    padding: 0;
-    border: 1px solid rgba(189, 156, 156, 0.35);
-    background: rgba(189, 156, 156, 0.07);
-    animation: hitbox-pulse 1.4s ease-in-out infinite;
-}
-
-.debris-hitbox:hover,
-.debris-hitbox:focus-visible {
-    border-color: #bd9c9c;
-    background: rgba(189, 156, 156, 0.25);
-}
-
-@keyframes hitbox-pulse {
-    0%, 100% { opacity: 0.45; }
-    50% { opacity: 1; }
-}
-
 @media (max-width: 640px) {
     #top-hud { top: 10px; left: 10px; right: 10px; }
     #top-hud button { padding: 7px 8px; font-size: 9px; }
     .battery-track { width: 58px; }
     #battery-meter span { display: none; }
-    #dialogue { left: 2%; width: 96%; max-height: 34vh; }
+    #dialogue {
+        bottom: 10px;
+        left: 10px;
+        width: calc(100% - 20px);
+        min-height: 96px;
+        max-height: 31vh;
+        padding: 12px 13px 14px;
+    }
+    #dialogue-text { font-size: 12px; line-height: 1.45; }
+    #dialogue-next { padding: 8px 12px; font-size: 11px; }
 }
 
 /* Bloqueia os cliques no cenário durante os diálogos */
