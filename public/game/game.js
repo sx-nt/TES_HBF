@@ -336,11 +336,13 @@ function createHotspots(hotspots) {
 function updateInterface() {
     const button = document.getElementById("blindfold-button");
 
-    button.style.display = hasBlindfold ? "block" : "none";
+    button.style.display = hasBlindfold || (debrisExamined && inventory.includes("madeira")) ? "block" : "none";
 
-    button.textContent = blindfoldOn
-        ? "Retirar venda"
-        : "Colocar venda";
+    button.textContent = !hasBlindfold
+        ? "Colocar venda"
+        : blindfoldOn
+            ? "Retirar venda"
+            : "Colocar venda";
 
     updateSceneActions();
 }
@@ -357,7 +359,6 @@ function updateSceneActions() {
         } else if (!inventory.includes("madeira")) {
             addAction("Coletar madeira", collectWood);
         }
-        if (debrisExamined && !hasBlindfold) addAction("Colocar venda", receiveBlindfold);
         if (hasBlindfold) addAction("Ir para os portões", goToGates);
     }
 
@@ -368,16 +369,17 @@ function updateSceneActions() {
             addAction("Examinar ferramentas novamente", examineTools);
         }
 
-        if (toolsExamined) addAction("Examinar janela", examineWindow);
-
-        if (windowsCovered && !blindfoldOn) {
+        if (toolsExamined) {
             addAction("Entrar na casa", () => loadScene("quarto"));
         }
     }
 
     if (currentScene === "quarto") {
-        addAction("Examinar espelho", () => loadScene("mirror"));
-        addAction("Ir para a construção", () => loadScene("construcao"));
+        addAction("Examinar janela", examineWindow);
+        if (windowsCovered && !blindfoldOn) {
+            addAction("Examinar espelho", () => loadScene("mirror"));
+            addAction("Ir para a construção", () => loadScene("construcao"));
+        }
         addAction("Voltar aos portões", returnToGates);
     }
 
@@ -443,12 +445,26 @@ function examineDebris() {
     });
 }
 
+function receiveBlindfold() {
+    if (!debrisExamined || !inventory.includes("madeira") || hasBlindfold) return;
+
+    hasBlindfold = true;
+    blindfoldOn = true;
+    loadScene("beach", () => {
+        showDialogue([
+            "A venda foi ativada.",
+            "Agora mantenha-a no rosto e siga as instruções do MEE."
+        ], updateSceneActions, "MEE");
+    });
+}
+
 function collectWood() {
     if (!debrisExamined || inventory.includes("madeira")) return;
     inventory.push("madeira");
     battery = Math.max(0, battery - 5);
     updateInventory();
     updateBattery();
+    updateInterface();
     updateSceneActions();
 }
 
@@ -545,7 +561,10 @@ function returnToGates() {
 // MECÂNICA DA VENDA
 
 function toggleBlindfold() {
-    if (!hasBlindfold) return;
+    if (!hasBlindfold) {
+        receiveBlindfold();
+        return;
+    }
 
     if (blindfoldOn) {
         if (scenes[currentScene].hasHuman || (currentScene !== "beach" && !windowsCovered)) {
