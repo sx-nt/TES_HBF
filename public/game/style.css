@@ -48,7 +48,7 @@ button:hover {
 
 #scene {
     position: relative;
-    width: min(100vw, 260vh);
+    width: min(100vw, 220vh);
     aspect-ratio: 2048 / 682;
 }
 
@@ -195,11 +195,12 @@ button:hover {
 
 #dialogue {
     position: absolute;
-    bottom: 14px;
+    bottom: 24px;
     left: max(14px, 3vw);
     width: calc(100% - max(28px, 6vw));
-    min-height: 104px;
-    max-height: 26vh;
+    height: 156px;
+    min-height: 156px;
+    max-height: 156px;
     padding: 14px 18px 16px;
     background: rgba(10, 10, 10, 0.96);
     border: 1px solid #777;
@@ -623,15 +624,16 @@ button:hover {
     #top-hud button { padding: 7px 8px; font-size: 9px; }
     .battery-track { width: 58px; }
     #battery-meter span { display: none; }
-    #dialogue {
-        bottom: 10px;
-        left: 10px;
-        width: calc(100% - 20px);
-        min-height: 96px;
-        max-height: 31vh;
-        padding: 12px 13px 14px;
-    }
-    #dialogue-text { font-size: 12px; line-height: 1.45; }
+#dialogue {
+  bottom: 16px;
+  left: 10px;
+  width: calc(100% - 20px);
+  height: 132px;
+  min-height: 132px;
+  max-height: 132px;
+  padding: 12px 13px 14px;
+  }
+#dialogue-text { font-size: 12px; line-height: 1.45; }
     #dialogue-next { padding: 8px 12px; font-size: 11px; }
 }
 

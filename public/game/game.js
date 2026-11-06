@@ -90,7 +90,11 @@ let computerExamined = false;
 let debrisExamined = false;
 let inventory = [];
 let gatesReady = false;
-let debrisHitboxes = [];
+let toolsExamined = false;
+let hasHammer = false;
+let hasNails = false;
+let windowsExamined = false;
+let windowsCovered = false;
 let battery = 100;
 let isPaused = false;
 let bootInterval = null;
@@ -246,7 +250,11 @@ function startGame() {
     debrisExamined = false;
     inventory = [];
     gatesReady = false;
-    debrisHitboxes = [];
+    toolsExamined = false;
+    hasHammer = false;
+    hasNails = false;
+    windowsExamined = false;
+    windowsCovered = false;
     battery = 100;
     isPaused = false;
     updateInventory();
@@ -350,44 +358,32 @@ function updateSceneActions() {
         if (hasBlindfold) addAction("Ir para os portões", goToGates);
     }
 
-    if (currentScene === "gates" && gatesReady) {
-        addAction("Seguir Officer Gates", () => loadScene("houseFront"));
-    }
-
     if (currentScene === "houseFront") {
-        addAction("Entrar na casa", () => loadScene("quarto"));
+        if (!toolsExamined) {
+            addAction("Examinar ferramentas", examineTools);
+        } else if (!hasHammer || !hasNails) {
+            addAction("Examinar ferramentas novamente", examineTools);
+        }
+
+        if (toolsExamined) addAction("Examinar janela", examineWindow);
+
+        if (windowsCovered && !blindfoldOn) {
+            addAction("Entrar na casa", () => loadScene("quarto"));
+        }
     }
 
     if (currentScene === "quarto") {
-        addAction("Examinar espelho", () => {
-            loadScene("mirror");
-        });
-
-        addAction("Ir para a construção", () => {
-            loadScene("construcao");
-        });
+        addAction("Examinar espelho", () => loadScene("mirror"));
+        addAction("Ir para a construção", () => loadScene("construcao"));
+        addAction("Voltar aos portões", returnToGates);
     }
 
     if (currentScene === "mirror") {
-        addAction("Voltar ao quarto", () => {
-            loadScene("quarto");
-        });
+        addAction("Voltar ao quarto", () => loadScene("quarto"));
     }
 
     if (currentScene === "construcao") {
-        addAction("Voltar ao quarto", () => {
-            loadScene("quarto");
-        });
-
-        addAction("Ir para WW", () => {
-            loadScene("ww");
-        });
-    }
-
-    if (currentScene === "ww") {
-        addAction("Voltar", () => {
-            loadScene("construcao");
-        });
+        addAction("Voltar ao quarto", () => loadScene("quarto"));
     }
 }
 
@@ -440,7 +436,9 @@ function examineDebris() {
     const dialogue = getDialogue("computerIntro");
     playDialogueSteps(dialogue.steps).then(() => {
         debrisExamined = true;
-        updateSceneActions();
+        hasBlindfold = true;
+        blindfoldOn = true;
+        loadScene("beach", updateSceneActions);
     });
 }
 
@@ -448,8 +446,6 @@ function collectWood() {
     if (!debrisExamined || inventory.includes("madeira")) return;
     inventory.push("madeira");
     battery = Math.max(0, battery - 5);
-    debrisHitboxes.forEach(hitbox => hitbox.remove());
-    debrisHitboxes = [];
     updateInventory();
     updateBattery();
     updateSceneActions();
@@ -460,15 +456,74 @@ function startGatesSequence() {
     const incoming = getDialogue("incomingPeople");
     const officer = getDialogue("officerWelcome");
     showDialogue(incoming.lines, () => {
-        loadScene("gates", () => {
-            const gatesBackground = document.getElementById("background");
-            gatesBackground.src = "assets/maps/C_Venda/gates_officer.png";
-            showDialogue(officer.lines, () => {
-                gatesReady = true;
-                loadScene("houseFront");
-            }, officer.speaker);
-        });
+        const gatesBackground = document.getElementById("background");
+        gatesBackground.src = "assets/maps/C_Venda/gates_officer.png";
+        showDialogue(officer.lines, () => {
+            gatesReady = true;
+            loadScene("houseFront");
+        }, officer.speaker);
     }, incoming.speaker);
+}
+
+function examineTools() {
+    toolsExamined = true;
+    showChoiceDialogue(
+        "Há um martelo e alguns pregos sobre a bancada. Você quer levar as ferramentas?",
+        [
+            {
+                label: "Pegar martelo e pregos",
+                action: () => {
+                    hasHammer = true;
+                    hasNails = true;
+                    updateSceneActions();
+                }
+            },
+            {
+                label: "Deixar as ferramentas",
+                action: updateSceneActions
+            }
+        ],
+        "MEE"
+    );
+}
+
+function examineWindow() {
+    windowsExamined = true;
+    const canCover = inventory.includes("madeira") && hasHammer && hasNails;
+    if (!canCover) {
+        showDialogue([
+            "As janelas estão abertas.",
+            "Preciso de madeira, um martelo e pregos para tapá-las.",
+            "Não posso tirar a venda até que a casa esteja protegida."
+        ], updateSceneActions, "MEE");
+        return;
+    }
+
+    showChoiceDialogue(
+        "As janelas podem ser tapadas agora. Usar a madeira e as ferramentas?",
+        [
+            { label: "Tapar as janelas", action: coverWindows },
+            { label: "Ainda não", action: updateSceneActions }
+        ],
+        "MEE"
+    );
+}
+
+function coverWindows() {
+    windowsCovered = true;
+    showDialogue([
+        "As janelas estão tapadas.",
+        "Agora posso retirar a venda com segurança e só então continuar o restante do puzzle."
+    ], updateSceneActions, "MEE");
+}
+
+function returnToGates() {
+    loadScene("gates", () => {
+        const gatesBackground = document.getElementById("background");
+        gatesBackground.src = "assets/maps/C_Venda/gates_officer.png";
+        const officer = getDialogue("officerWelcome");
+        showDialogue(officer.lines, updateSceneActions, officer.speaker);
+    });
 }
 
 // MECÂNICA DA VENDA
@@ -477,7 +532,7 @@ function toggleBlindfold() {
     if (!hasBlindfold) return;
 
     if (blindfoldOn) {
-        if (scenes[currentScene].hasHuman) {
+        if (scenes[currentScene].hasHuman || !windowsCovered) {
             gameOver();
             return;
         }
@@ -777,7 +832,11 @@ function restartGame() {
     debrisExamined = false;
     inventory = [];
     gatesReady = false;
-    debrisHitboxes = [];
+    toolsExamined = false;
+    hasHammer = false;
+    hasNails = false;
+    windowsExamined = false;
+    windowsCovered = false;
     battery = 100;
     isPaused = false;
     document.getElementById("top-hud").classList.add("hidden");
