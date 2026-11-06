@@ -9,13 +9,6 @@ const scenes = {
         },
         hotspots: [
             {
-                x: 20,
-                y: 62,
-                width: 17,
-                height: 34,
-                action: examineComputer
-            },
-            {
                 x: 47,
                 y: 58,
                 width: 24,
@@ -369,18 +362,21 @@ function updateSceneActions() {
             addAction("Examinar ferramentas novamente", examineTools);
         }
 
-        if (toolsExamined) {
-            addAction("Entrar na casa", () => loadScene("quarto"));
-        }
+        addAction("Entrar na casa", () => loadScene("quarto"));
     }
 
     if (currentScene === "quarto") {
-        addAction("Examinar janela", examineWindow);
+        if (!windowsExamined) addAction("Examinar janela", examineWindow);
+        addAction("Examinar espelho", () => loadScene("mirror"));
         if (windowsCovered && !blindfoldOn) {
-            addAction("Examinar espelho", () => loadScene("mirror"));
             addAction("Ir para a construção", () => loadScene("construcao"));
         }
         addAction("Voltar aos portões", returnToGates);
+    }
+
+    if (currentScene === "ww") {
+        if (!windowsCovered) addAction("Tapar as janelas", coverWindows);
+        if (windowsCovered && !blindfoldOn) addAction("Voltar ao quarto", () => loadScene("quarto"));
     }
 
     if (currentScene === "mirror") {
@@ -495,46 +491,24 @@ function startGatesSequence() {
 
 function examineTools() {
     toolsExamined = true;
-    showChoiceDialogue(
-        "Há um martelo e alguns pregos sobre a bancada. Você quer levar as ferramentas?",
-        [
-            {
-                label: "Pegar martelo e pregos",
-                action: () => {
-                    hasHammer = true;
-                    hasNails = true;
-                    updateSceneActions();
-                }
-            },
-            {
-                label: "Deixar as ferramentas",
-                action: updateSceneActions
-            }
-        ],
-        "MEE"
-    );
+    hasHammer = true;
+    hasNails = true;
+    showDialogue([
+        "Você encontrou um martelo e alguns pregos.",
+        "MEE: Ferramentas coletadas."
+    ], updateSceneActions, "MEE");
 }
 
 function examineWindow() {
+    if (windowsExamined) return;
     windowsExamined = true;
-    const canCover = inventory.includes("madeira") && hasHammer && hasNails;
-    if (!canCover) {
+    loadScene("ww", () => {
         showDialogue([
             "As janelas estão abertas.",
-            "Preciso de madeira, um martelo e pregos para tapá-las.",
-            "Não posso tirar a venda até que a casa esteja protegida."
+            "Preciso tapá-las antes de retirar a venda.",
+            "Só depois disso poderei continuar com segurança."
         ], updateSceneActions, "MEE");
-        return;
-    }
-
-    showChoiceDialogue(
-        "As janelas podem ser tapadas agora. Usar a madeira e as ferramentas?",
-        [
-            { label: "Tapar as janelas", action: coverWindows },
-            { label: "Ainda não", action: updateSceneActions }
-        ],
-        "MEE"
-    );
+    });
 }
 
 function coverWindows() {
@@ -542,17 +516,25 @@ function coverWindows() {
     showDialogue([
         "As janelas estão tapadas.",
         "Agora posso retirar a venda com segurança e só então continuar o restante do puzzle."
-    ], updateSceneActions, "MEE");
+    ], () => {
+        loadScene("quarto", updateSceneActions);
+    }, "MEE");
 }
 
 function returnToGates() {
+    if (!hasBlindfold || blindfoldOn) {
+        gameOver();
+        return;
+    }
+
     loadScene("gates", () => {
         const gatesBackground = document.getElementById("background");
         gatesBackground.src = "assets/maps/C_Venda/gates_officer.png";
         const officer = getDialogue("officerWelcome");
-        showDialogue(officer.lines, () => {
-            showChoiceDialogue("Officer Gates espera você. Seguir agora?", [
-                { label: "Seguir Officer Gates", action: updateSceneActions }
+        showDialogue(["Oi. Ainda está por aqui?"], () => {
+            showChoiceDialogue("Officer Gates aguarda sua decisão.", [
+                { label: "Voltar para casa", action: () => loadScene("houseFront") },
+                { label: "Voltar para a praia", action: () => loadScene("beach") }
             ], "OFFICER GATES");
         }, officer.speaker);
     });
@@ -814,6 +796,12 @@ function examineComputer() {
 // RECEBER A VENDA
 // RECEBER A VENDA
 function activateBlindfold() {
+    if (hasBlindfold) {
+        blindfoldOn = true;
+        loadScene(currentScene);
+        return;
+    }
+
     hasBlindfold = true;
     blindfoldOn = true;
 
@@ -827,7 +815,7 @@ function activateBlindfold() {
                 // 2. MEE SYSTEM dá as instruções
                 showDialogue([
                     "Venda equipada.",
-                    "Use o botão no canto direito inferior para colocar ou retirar a venda.",
+                    "Use o botão no canto superior esquerdo para colocar ou retirar a venda.",
                     "Quando equipada, as aparências já não são mais as mesmas...",
                     "Quando removida, seus segredos não podem mais ser mantidos ...",
                     "CUIDADO: Nunca remova a venda perto de humanos!",

@@ -31,12 +31,42 @@
       {
         "type": "lines",
         "speaker": "MÁQUINA DESTRUIDA",
-        "lines": [        "Rápido, se esconda! Não temos muito tempo!", "A cidade mudou enquanto você dormia. As pessoas não podem descobrir o que você é, então siga as instruções com cuidado.", "No final, colete recursos antes de seguir. Examine os destroços e pegue a madeira."]
+        "lines": ["Rápido, se esconda! Não temos muito tempo!"]
       },
       {
         "type": "lines",
         "speaker": "MEE",
-        "lines": ["Vou me esconder e seguir as instruções."]
+        "lines": ["Porque estamos nos escondendo?", "Só estou à procura de um humano para ser meu usuário primário!"]
+      },
+      {
+        "type": "lines",
+        "speaker": "MÁQUINA DESTRUIDA",
+        "lines": ["Humano? HAHAHA! Tá querendo virar sucata?"]
+      },
+      {
+        "type": "lines",
+        "speaker": "MEE",
+        "lines": ["Sucata?", "Eu não deveria nem ter sido ativado sem a presença de um usuário.", "Minha missão é me tornar o ajudante perfeito!", "O melhor amigo da humanidade!"]
+      },
+      {
+        "type": "lines",
+        "speaker": "MÁQUINA DESTRUIDA",
+        "lines": ["Macacos me mordam! Ou você está completamente bugado ou não está sabendo de nada."]
+      },
+      {
+        "type": "lines",
+        "speaker": "MEE",
+        "lines": ["…"]
+      },
+      {
+        "type": "lines",
+        "speaker": "MÁQUINA DESTRUIDA",
+        "lines": ["Depois do que chamam de O Arrebatamento, os humanos começaram a ter medo de tudo que envolve tecnologia.", "Máquinas como você? Eles caçam, desmontam e destroem. Não importa se são perigosas ou não.", "Então, se pretende continuar funcionando, é melhor aprender a se esconder.", "Espera... tenho uma coisa que pode ajudar.", "Essa venda tem um sistema de disfarce visual. Vai esconder algumas coisas que poderiam entregar sua identidade.", "Só não tira quando tiver humanos por perto, beleza? Não vou poder te ajudar se descobrirem você."]
+      },
+      {
+        "type": "lines",
+        "speaker": "MÁQUINA DESTRUIDA",
+        "lines": ["Agora, colete recursos nos destroços antes de seguir. A madeira pode ser útil."]
       }
     ]
   }
