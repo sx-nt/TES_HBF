@@ -273,6 +273,8 @@ function loadScene(sceneName, onLoaded = null) {
         ? scene.images.blindfolded
         : scene.images.unblindfolded;
 
+    document.getElementById("scene-actions").innerHTML = "";
+
     const preload = new Image();
 
     preload.onload = () => {
@@ -355,6 +357,7 @@ function updateSceneActions() {
         } else if (!inventory.includes("madeira")) {
             addAction("Coletar madeira", collectWood);
         }
+        if (debrisExamined && !hasBlindfold) addAction("Colocar venda", receiveBlindfold);
         if (hasBlindfold) addAction("Ir para os portões", goToGates);
     }
 
@@ -436,8 +439,6 @@ function examineDebris() {
     const dialogue = getDialogue("computerIntro");
     playDialogueSteps(dialogue.steps).then(() => {
         debrisExamined = true;
-        hasBlindfold = true;
-        blindfoldOn = true;
         loadScene("beach", updateSceneActions);
     });
 }
@@ -455,14 +456,25 @@ function startGatesSequence() {
     if (gatesReady) return;
     const incoming = getDialogue("incomingPeople");
     const officer = getDialogue("officerWelcome");
-    showDialogue(incoming.lines, () => {
-        const gatesBackground = document.getElementById("background");
-        gatesBackground.src = "assets/maps/C_Venda/gates_officer.png";
-        showDialogue(officer.lines, () => {
-            gatesReady = true;
-            loadScene("houseFront");
-        }, officer.speaker);
-    }, incoming.speaker);
+  showDialogue(incoming.lines, () => {
+  const officerPreload = new Image();
+  officerPreload.onload = () => {
+  const gatesBackground = document.getElementById("background");
+  gatesBackground.src = "assets/maps/C_Venda/gates_officer.png";
+  showDialogue(officer.lines, () => {
+  showChoiceDialogue("Officer Gates espera você. Seguir agora?", [
+  {
+  label: "Seguir Officer Gates",
+  action: () => {
+  gatesReady = true;
+  loadScene("houseFront");
+  }
+  }
+  ], "OFFICER GATES");
+  }, officer.speaker);
+  };
+  officerPreload.src = "assets/maps/C_Venda/gates_officer.png";
+  }, incoming.speaker);
 }
 
 function examineTools() {
@@ -522,7 +534,11 @@ function returnToGates() {
         const gatesBackground = document.getElementById("background");
         gatesBackground.src = "assets/maps/C_Venda/gates_officer.png";
         const officer = getDialogue("officerWelcome");
-        showDialogue(officer.lines, updateSceneActions, officer.speaker);
+        showDialogue(officer.lines, () => {
+            showChoiceDialogue("Officer Gates espera você. Seguir agora?", [
+                { label: "Seguir Officer Gates", action: updateSceneActions }
+            ], "OFFICER GATES");
+        }, officer.speaker);
     });
 }
 
@@ -532,7 +548,7 @@ function toggleBlindfold() {
     if (!hasBlindfold) return;
 
     if (blindfoldOn) {
-        if (scenes[currentScene].hasHuman || !windowsCovered) {
+        if (scenes[currentScene].hasHuman || (currentScene !== "beach" && !windowsCovered)) {
             gameOver();
             return;
         }
@@ -663,6 +679,8 @@ async function showChoiceDialogue(question, choicesList, speaker = "") {
 
             await fadeText(text);
             choices.classList.add("hidden");
+            dialogue.classList.add("hidden");
+            document.getElementById("game").classList.remove("dialogue-active");
 
             if (choice.action) {
                 choice.action();
@@ -867,6 +885,7 @@ document.getElementById("start-button").addEventListener("click", () => {
     });
 });
 
+document.getElementById("restart-button").addEventListener("click", restartGame);
 document.getElementById("blindfold-button").addEventListener("click", toggleBlindfold);
 document.getElementById("inventory-toggle").addEventListener("click", toggleInventory);
 document.getElementById("pause-button").addEventListener("click", togglePause);
