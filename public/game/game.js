@@ -562,7 +562,7 @@ function returnToGates() {
 
 function toggleBlindfold() {
     if (!hasBlindfold) {
-        receiveBlindfold();
+        activateBlindfold();
         return;
     }
 
@@ -813,7 +813,7 @@ function examineComputer() {
 
 // RECEBER A VENDA
 // RECEBER A VENDA
-function receiveBlindfold() {
+function activateBlindfold() {
     hasBlindfold = true;
     blindfoldOn = true;
 
