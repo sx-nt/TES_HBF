@@ -466,27 +466,38 @@ function collectWood() {
 
 function startGatesSequence() {
     if (gatesReady) return;
+
     const incoming = getDialogue("incomingPeople");
     const officer = getDialogue("officerWelcome");
-  showDialogue(incoming.lines, () => {
-  const officerPreload = new Image();
-  officerPreload.onload = () => {
-  const gatesBackground = document.getElementById("background");
-  gatesBackground.src = "assets/maps/C_Venda/gates_officer.png";
-  showDialogue(officer.lines, () => {
-  showChoiceDialogue("Officer Gates espera você. Seguir agora?", [
-  {
-  label: "Seguir Officer Gates",
-  action: () => {
-  gatesReady = true;
-  loadScene("houseFront");
-  }
-  }
-  ], "OFFICER GATES");
-  }, officer.speaker);
-  };
-  officerPreload.src = "assets/maps/C_Venda/gates_officer.png";
-  }, incoming.speaker);
+
+    showDialogue(incoming.lines, () => {
+        const officerPreload = new Image();
+
+        officerPreload.onload = () => {
+            const gatesBackground = document.getElementById("background");
+            gatesBackground.src = "assets/maps/C_Venda/gates_officer.png";
+
+            // Executa todas as etapas do diálogo do agente
+            playDialogueSteps(officer.steps).then(() => {
+                showChoiceDialogue("O Agente espera você. Seguir agora?", [
+                    {
+                        label: "Seguir O Agente",
+                        action: () => {
+                            gatesReady = true;
+                            loadScene("houseFront");
+                        }
+                    }
+                ], "O AGENTE");
+            });
+        };
+
+        officerPreload.onerror = () => {
+            console.error("Erro ao carregar imagem do agente.");
+        };
+
+        officerPreload.src = "assets/maps/C_Venda/gates_officer.png";
+
+    }, incoming.speaker);
 }
 
 function examineTools() {
@@ -495,7 +506,7 @@ function examineTools() {
     hasNails = true;
     showDialogue([
         "Você encontrou um martelo e alguns pregos.",
-        "MEE: Ferramentas coletadas."
+        "MEE SYSTEM: Ferramentas coletadas."
     ], updateSceneActions, "MEE");
 }
 
@@ -504,21 +515,23 @@ function examineWindow() {
     windowsExamined = true;
     loadScene("ww", () => {
         showDialogue([
-            "As janelas estão abertas.",
-            "Preciso tapá-las antes de retirar a venda.",
-            "Só depois disso poderei continuar com segurança."
+            "Parece que estou sendo vigiado...",
+            "Preciso fazer algo para que possa tirar a venda sem ser pego.",
+            "Talvez a madeira e as ferramentas possam ser úteis."
         ], updateSceneActions, "MEE");
     });
 }
 
 function coverWindows() {
     windowsCovered = true;
-    showDialogue([
-        "As janelas estão tapadas.",
-        "Agora posso retirar a venda com segurança e só então continuar o restante do puzzle."
-    ], () => {
-        loadScene("quarto", updateSceneActions);
-    }, "MEE");
+
+    loadScene("quarto", () => {
+        showDialogue([
+            "Ótimo. Agora que as janelas estão cobertas, posso retirar a venda sem correr o risco de ser visto."
+        ], null, "MEE");
+
+        updateSceneActions();
+    });
 }
 
 function returnToGates() {
@@ -532,10 +545,10 @@ function returnToGates() {
         gatesBackground.src = "assets/maps/C_Venda/gates_officer.png";
         const officer = getDialogue("officerWelcome");
         showDialogue(["Oi. Ainda está por aqui?"], () => {
-            showChoiceDialogue("Officer Gates aguarda sua decisão.", [
+            showChoiceDialogue("O Agente aguarda sua decisão.", [
                 { label: "Voltar para casa", action: () => loadScene("houseFront") },
                 { label: "Voltar para a praia", action: () => loadScene("beach") }
-            ], "OFFICER GATES");
+            ], "O AGENTE");
         }, officer.speaker);
     });
 }

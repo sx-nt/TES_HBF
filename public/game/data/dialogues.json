@@ -1,15 +1,74 @@
 {
   "debrisFound": {
     "speaker": "MEE",
-    "lines": ["Esses destroços ainda podem ser úteis.", "Consegui separar um pedaço de madeira."]
+    "lines": ["Esses destroços ainda podem ser úteis.", "Vou separar alguns pedaços de madeira."]
   },
   "incomingPeople": {
     "speaker": "MEE SYSTEM",
     "lines": ["ALERTA: pessoas se aproximando.", "Mantenha a venda e não faça movimentos suspeitos."]
   },
   "officerWelcome": {
-    "speaker": "OFFICER GATES",
-    "lines": ["Bem-vindo à cidade.", "Siga-me. Vou levar você até a sua casa."]
+      "steps": [
+          {
+              "type": "lines",
+              "speaker": "??",
+              "lines": [
+                  "Olá! ... Seja bem-vindo à cidade.",
+                  "Uma nova chegada. Que agradável.",
+                  "Vejo que é novo por aqui. Conheço praticamente todos que entram e saem pelos nossos portões.",
+                  "Ou, pelo menos, todos aqueles que precisam ser conhecidos.",
+                  "Não se preocupe. Sua chegada já foi registrada."
+              ]
+          },
+          {
+              "type": "lines",
+              "speaker": "O AGENTE",
+              "lines": [
+                  "Perdoe minha falta de apresentação. Sou um agente do Departamento de Conformidade Social.",
+                  "Minha função é garantir que todos os residentes sejam devidamente registrados, classificados e encaminhados.",
+                  "Trabalhamos para preservar a ordem. Afinal, uma comunidade só funciona quando todos compreendem seu lugar nela.",
+                  "Você será alocado em uma residência que foi recentemente liberada.",
+                  "Ela pertencia a outro morador, mas sua situação foi... resolvida."
+              ]
+          },
+          {
+              "type": "lines",
+              "speaker": "MEE",
+              "lines": [
+                  "E o que aconteceu com o antigo morador?"
+              ]
+          },
+          {
+              "type": "lines",
+              "speaker": "O AGENTE",
+              "lines": [
+                  "O antigo residente apresentou algumas dificuldades de adaptação.",
+                  "Recusava-se a cumprir determinadas orientações e insistia em questionar decisões que não lhe competiam.",
+                  "Tentamos ajudá-lo, naturalmente. O departamento oferece inúmeras oportunidades de correção.",
+                  "Mas, quando um indivíduo demonstra repetidamente não ter condições de cooperar, certos procedimentos precisam ser iniciados.",
+                  "O registro dele foi encerrado.",
+                  "Mas não há motivo para se preocupar com isso!",
+                  "Afinal, você parece bastante... cooperativo"
+              ]
+          },
+          {
+              "type": "lines",
+              "speaker": "MEE",
+              "lines": [
+                  "..."
+              ]
+          },
+          {
+              "type": "lines",
+              "speaker": "O AGENTE",
+              "lines": [
+                  "Dentro de alguns dias, um responsável do departamento virá até você para designar uma função.",
+                  "Todos os novos residentes recebem uma ocupação de acordo com as necessidades da cidade.",
+                  "É importante que compareça quando for convocado. Ausências não justificadas podem gerar advertências.",
+                  "Sua residência está esperando. Siga-me, por favor."
+              ]
+          }
+      ]
   },
   "computerAlreadyExamined": {
     "speaker": "MÁQUINA DESTRUIDA",
