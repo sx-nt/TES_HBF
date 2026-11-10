@@ -525,13 +525,6 @@ function updateBlindfoldButton() {
     button.setAttribute("aria-label", blindfoldOn ? "Retirar venda" : "Colocar venda");
 }
 
-function toggleBlindfold() {
-    if (!hasBlindfold) return;
-    blindfoldOn = !blindfoldOn;
-    updateBlindfoldButton();
-    loadScene(currentScene, updateSceneActions);
-}
-
 function saveGame() {
     const saveState = {
         blindfoldOn, hasBlindfold, computerExamined, debrisExamined, inventory,
