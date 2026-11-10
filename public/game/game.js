@@ -823,6 +823,35 @@ function toggleBlindfold() {
 // EFEITO DE TEXTO
 let typingInterval = null;
 let finishTyping = null;
+let typingVoice = null;
+
+const dialogueVoiceBySpeaker = {
+    "MAQUINA": "assets/sfx/voices/voice_maquina.mp3",
+    "MÁQUINA": "assets/sfx/voices/voice_maquina.mp3",
+    "O AGENTE": "assets/sfx/voices/voice_officer.mp3",
+    "AGENTE": "assets/sfx/voices/voice_officer.mp3",
+    "MEE SYSTEM": "assets/sfx/voices/voice_system.mp3",
+    "SISTEMA": "assets/sfx/voices/voice_system.mp3"
+};
+
+function stopTypingVoice() {
+    if (!typingVoice) return;
+
+    typingVoice.pause();
+    typingVoice.currentTime = 0;
+    typingVoice = null;
+}
+
+function startTypingVoice() {
+    stopTypingVoice();
+
+    const speaker = document.getElementById("dialogue-speaker")?.textContent?.trim().toUpperCase();
+    const voicePath = dialogueVoiceBySpeaker[speaker] || dialogueVoiceBySpeaker["MEE SYSTEM"];
+    typingVoice = new Audio(voicePath);
+    typingVoice.loop = true;
+    typingVoice.volume = 0.35;
+    typingVoice.play().catch(() => {});
+}
 
 function typeText(element, text, speed = 35) {
     return new Promise(resolve => {
@@ -830,9 +859,10 @@ function typeText(element, text, speed = 35) {
 
         element.textContent = "";
         finishTyping = null;
+        startTypingVoice();
 
-        // CORREÇÃO: Se o texto for vazio ou nulo, resolve imediatamente (evita o UNDEFINED)
         if (!text || text.trim() === "") {
+            stopTypingVoice();
             resolve();
             return;
         }
@@ -843,6 +873,7 @@ function typeText(element, text, speed = 35) {
                 typingInterval = null;
             }
 
+            stopTypingVoice();
             element.textContent = text;
             finishTyping = null;
             resolve();
@@ -851,16 +882,16 @@ function typeText(element, text, speed = 35) {
         finishTyping = finish;
 
         typingInterval = setInterval(() => {
-            // CORREÇÃO: Verifica se o caractere existe antes de adicionar
             if (text[index] !== undefined) {
                 element.textContent += text[index];
             }
-            
+
             index++;
 
             if (index >= text.length) {
                 clearInterval(typingInterval);
                 typingInterval = null;
+                stopTypingVoice();
                 finishTyping = null;
                 resolve();
             }
