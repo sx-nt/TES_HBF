@@ -677,6 +677,7 @@ function examineMachine() {
     if (!machineExamined) {
         machineExamined = true;
         machineZoomActive = true;
+        unlockVoice("assets/sfx/voices/voice_maquina.mp3");
         loadScene("construcao", () => showDialogue(
             ["A máquina destruída ainda guarda sinais de energia."],
             () => {
@@ -842,8 +843,17 @@ function stopTypingVoice() {
     typingVoice = null;
 }
 
+function unlockVoice(voicePath) {
+  const audio = new Audio(voicePath);
+  audio.volume = 0;
+  audio.play().then(() => {
+    audio.pause();
+    audio.currentTime = 0;
+  }).catch(() => {});
+}
+
 function startTypingVoice() {
-    stopTypingVoice();
+  stopTypingVoice();
 
   const speaker = document.getElementById("dialogue-speaker")?.textContent?.trim().toUpperCase();
   const isDestroyedMachineDialogue = currentScene === "construcao" && machineZoomActive;
