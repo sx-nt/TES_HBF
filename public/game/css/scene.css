@@ -6,7 +6,6 @@
     position: relative;
     width: min(100vw, 220vh);
     aspect-ratio: 2048 / 682;
-    filter: var(--grayscale-filter);
 }
 
 #background {

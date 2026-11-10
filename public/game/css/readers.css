@@ -52,7 +52,6 @@
     height: auto;
     margin: -25% 0 0 -12.5%;
     image-rendering: pixelated;
-    filter: var(--grayscale-filter);
 }
 
 #book-page-text {
