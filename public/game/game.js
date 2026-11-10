@@ -36,13 +36,14 @@ const scenes = {
         hotspots: []
     },
 
-    quarto: {
-        hasHuman: false,
-        images: {
-            blindfolded: "assets/maps/C_Venda/quarto_com_venda.png",
-            unblindfolded: "assets/maps/S_Venda/quarto_sem_venda.png"
-        },
-        hotspots: []
+   quarto: {
+    hasHuman: false,
+    images: {
+        blindfolded: "assets/maps/C_Venda/quarto_com_venda.png",
+        unblindfolded: "assets/maps/S_Venda/quarto_sem_venda.png",
+        windowsCovered: "assets/maps/C_Venda/quarto_com_venda_janela_tapada.png"
+    },
+    hotspots: []
     },
 
     mirror: {
@@ -315,14 +316,23 @@ function loadScene(sceneName, onLoaded = null) {
         ? scene.images.blindfolded
         : scene.images.unblindfolded;
 
-    if (sceneName === "quarto" && !blindfoldOn && pictureExamined) {
-        imagePath = "assets/maps/S_Venda/quarto_sem_venda_cofre.png";
+    // Seleção das imagens do quarto
+    if (sceneName === "quarto") {
+        if (windowsCovered && blindfoldOn) {
+            imagePath = scene.images.windowsCovered;
+        } else if (!blindfoldOn) {
+            imagePath = scene.images.unblindfolded;
+        } else {
+            imagePath = scene.images.blindfolded;
+        }
     }
 
+    // Zoom da máquina na praia
     if (sceneName === "beach" && machineZoomActive && !blindfoldOn) {
-    imagePath = "assets/maps/S_Venda/maquina_zoom_sem_venda.png";
-}
+        imagePath = "assets/maps/S_Venda/maquina_zoom_sem_venda.png";
+    }
 
+    // Zoom da máquina na construção
     if (sceneName === "construcao" && machineZoomActive && !blindfoldOn) {
         imagePath = "assets/maps/S_Venda/maquina_zoom_sem_venda.png";
     }
@@ -348,12 +358,17 @@ function loadScene(sceneName, onLoaded = null) {
             document.getElementById("game").classList.toggle("blindfold-active", blindfoldOn);
 
             const mirrorKeyOverlay = document.getElementById("mirror-key-overlay");
+
             if (mirrorKeyOverlay) {
-                mirrorKeyOverlay.classList.toggle("hidden", !(sceneName === "mirror" && !blindfoldOn && !keyCollected));
+                mirrorKeyOverlay.classList.toggle(
+                    "hidden",
+                    !(sceneName === "mirror" && !blindfoldOn && !keyCollected)
+                );
             }
 
             createHotspots(scene.hotspots || []);
             updateInterface();
+            updateBlindfoldButton();
 
             if (onLoaded) onLoaded();
         });
@@ -544,12 +559,12 @@ function toggleInventory() {
 function updateBlindfoldButton() {
     const button = document.getElementById("blindfold-button");
     if (!button) return;
-    button.replaceChildren();
-    const image = document.createElement("img");
-    image.src = blindfoldOn ? "assets/images/eye_closed_icon.png" : "assets/images/eye_open_icon.png";
-    image.alt = blindfoldOn ? "Colocar venda" : "Retirar venda";
-    button.appendChild(image);
-    button.setAttribute("aria-label", blindfoldOn ? "Retirar venda" : "Colocar venda");
+
+    button.textContent = blindfoldOn ? "Retirar venda" : "Colocar venda";
+    button.setAttribute(
+        "aria-label",
+        blindfoldOn ? "Retirar venda" : "Colocar venda"
+    );
 }
 
 function saveGame() {
@@ -808,24 +823,24 @@ function examineWindow() {
 
 function coverWindows() {
     if (!toolsExamined || !hasHammer || !hasNails) {
-        showDialogue(["Ainda não tenho como tapar as janelas, talvez deva procurar uma ferramenta que possa me ajudar"], updateSceneActions, "MEE");
+        showDialogue(
+            ["Ainda não tenho como tapar as janelas, talvez deva procurar uma ferramenta que possa me ajudar."],
+            updateSceneActions,
+            "MEE"
+        );
         return;
     }
+
     windowsCovered = true;
 
     loadScene("quarto", () => {
-        if (blindfoldOn) {
-            document.getElementById("background").src = "assets/maps/C_Venda/quarto_com_venda_janela_tapada.png";
-        }
-
-        showDialogue([
-            "Ótimo. Agora que as janelas estão cobertas posso retirar a venda."
-        ], null, "MEE");
-
-        updateSceneActions();
+        showDialogue(
+            ["Ótimo. Agora que as janelas estão cobertas posso retirar a venda."],
+            updateSceneActions,
+            "MEE"
+        );
     });
 }
-
 function returnToGates() {
     if (!hasBlindfold || blindfoldOn) {
         gameOver();
@@ -854,7 +869,10 @@ function toggleBlindfold() {
     }
 
     if (blindfoldOn) {
-        if (scenes[currentScene].hasHuman || (currentScene !== "beach" && !windowsCovered)) {
+        if (
+            scenes[currentScene].hasHuman ||
+            (currentScene !== "beach" && !windowsCovered)
+        ) {
             gameOver();
             return;
         }
@@ -866,7 +884,6 @@ function toggleBlindfold() {
 
     loadScene(currentScene);
 }
-
 
 // EFEITO DE TEXTO
 let typingInterval = null;
