@@ -122,7 +122,8 @@ let keyCollected = false;
 let cabinetUnlocked = false;
 let passwordFound = false;
 let machineExamined = false;
-let battery = 100;
+  let machineZoomActive = false;
+  let battery = 100;
 let isPaused = false;
 let bootInterval = null;
 
@@ -288,8 +289,9 @@ function startGame() {
     keyCollected = false;
     cabinetUnlocked = false;
     passwordFound = false;
-    machineExamined = false;
-    battery = 100;
+machineExamined = false;
+  machineZoomActive = false;
+  battery = 100;
     isPaused = false;
     updateInventory();
     updateBattery();
@@ -311,7 +313,7 @@ function loadScene(sceneName, onLoaded = null) {
         imagePath = "assets/maps/S_Venda/quarto_sem_venda_cofre.png";
     }
 
-    if (sceneName === "construcao" && machineExamined && !blindfoldOn) {
+    if (sceneName === "construcao" && machineZoomActive && !blindfoldOn) {
         imagePath = "assets/maps/S_Venda/maquina_zoom_sem_venda.png";
     }
 
@@ -632,7 +634,15 @@ function examineCabinet() {
 function examineMachine() {
     if (!machineExamined) {
         machineExamined = true;
-        loadScene("construcao", () => showDialogue(["A máquina destruída ainda guarda sinais de energia."], updateSceneActions, "MEE"));
+        machineZoomActive = true;
+        loadScene("construcao", () => showDialogue(
+            ["A máquina destruída ainda guarda sinais de energia."],
+            () => {
+                machineZoomActive = false;
+                loadScene("construcao");
+            },
+            "MEE"
+        ));
         return;
     }
     showDialogue(["Não há mais nada que eu possa retirar da máquina."], updateSceneActions, "MEE");
@@ -1070,8 +1080,9 @@ function restartGame() {
     keyCollected = false;
     cabinetUnlocked = false;
     passwordFound = false;
-    machineExamined = false;
-    battery = 100;
+machineExamined = false;
+  machineZoomActive = false;
+  battery = 100;
     isPaused = false;
     document.getElementById("top-hud").classList.add("hidden");
     document.getElementById("pause-menu").classList.add("hidden");
