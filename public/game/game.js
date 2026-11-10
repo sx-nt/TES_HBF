@@ -311,7 +311,7 @@ function loadScene(sceneName, onLoaded = null) {
         imagePath = "assets/maps/S_Venda/quarto_sem_venda_cofre.png";
     }
 
-    if (sceneName === "construcao" && !blindfoldOn && machineExamined) {
+    if (sceneName === "construcao" && machineExamined && !blindfoldOn) {
         imagePath = "assets/maps/S_Venda/maquina_zoom_sem_venda.png";
     }
 
@@ -435,24 +435,20 @@ function updateSceneActions() {
     }
 
     if (currentScene === "cofreAberto") {
-        if (!bookCollected) {
-            addAction("Pegar o livro", collectBook);
-        } else {
-            addAction("Voltar ao quarto", () => loadScene("quarto"));
-        }
+        if (!bookCollected) addAction("Pegar o livro", collectBook);
+        addAction("Voltar ao quarto", () => loadScene("quarto"));
     }
 
     if (currentScene === "ww") {
         if (!windowsCovered) addAction("Tapar as janelas", coverWindows);
-        if (windowsCovered && !blindfoldOn) addAction("Voltar ao quarto", () => loadScene("quarto"));
+        addAction("Voltar ao quarto", () => loadScene("quarto"));
     }
 
     if (currentScene === "mirror") {
-        if (!keyCollected) {
+        if (!keyCollected && !blindfoldOn) {
             addAction("Coletar chave", collectKey);
-        } else {
-            addAction("Voltar ao quarto", () => loadScene("quarto"));
         }
+        addAction("Voltar ao quarto", () => loadScene("quarto"));
     }
 
     if (currentScene === "construcao") {
