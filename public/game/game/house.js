@@ -3,7 +3,6 @@
 import { state } from "../core/state.js";
 import { $ } from "../core/utils.js";
 import { showDialogue } from "../ui/dialogue.js";
-import { withObjective } from "../ui/objectives.js";
 import { addItem } from "../ui/inventory.js";
 import { loadScene, refreshSceneUI } from "./scene-loader.js";
 
@@ -15,7 +14,7 @@ export function examineWindow() {
             "Parece que estou sendo vigiado...",
             "Preciso fazer algo para que possa tirar a venda sem ser pego.",
             "Talvez algum item que coletei possa ser útil."
-        ], withObjective("tapar-janelas", "Encontre uma forma de tapar as janelas", refreshSceneUI), "MEE");
+        ], refreshSceneUI, "MEE");
     });
 }
 
@@ -34,7 +33,7 @@ export function coverWindows() {
     loadScene("quarto", () => {
         showDialogue(
             ["Ótimo. Agora que as janelas estão cobertas posso retirar a venda."],
-            withObjective("investigar-quarto", "Investigue o quarto sem a venda", refreshSceneUI),
+            refreshSceneUI,
             "MEE"
         );
     });
@@ -83,7 +82,7 @@ export function examineCabinet() {
     showDialogue([
         "A gaveta foi aberta.",
         "Há uma carteira de identidade dentro da gaveta. Talvez eu deva examiná-la no inventário."
-    ], withObjective("examinar-documento", "Examine o documento no inventário", refreshSceneUI), "MEE SYSTEM");
+    ], refreshSceneUI, "MEE SYSTEM");
 }
 
 // QUADRO E COFRE
@@ -104,7 +103,7 @@ export function removePicture() {
     loadScene("cofre", () => {
         showDialogue(
             ["O quadro escondia um cofre embutido na parede."],
-            withObjective("senha-cofre", "Descubra a senha do cofre", refreshSceneUI),
+            refreshSceneUI,
             "MEE SYSTEM"
         );
     });
@@ -128,7 +127,7 @@ export function collectBook() {
     state.bookCollected = true;
     addItem("livro");
     refreshSceneUI();
-    showDialogue(["Livro adicionado ao inventário."], withObjective("ler-livro", "Leia o livro", refreshSceneUI), "MEE SYSTEM");
+    showDialogue(["Livro adicionado ao inventário."], refreshSceneUI, "MEE SYSTEM");
 }
 
 // CONSTRUÇÃO

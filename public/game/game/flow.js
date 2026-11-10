@@ -3,7 +3,8 @@ import { state, resetState } from "../core/state.js";
 import { $ } from "../core/utils.js";
 import { stopBootSound, playBackgroundMusic, pauseBackgroundMusic } from "../core/audio.js";
 import { closeDialogue } from "../ui/dialogue.js";
-import { resetObjectives, completeObjective, closeObjectives } from "../ui/objectives.js";
+import { resetObjectives, closeObjectives } from "../ui/objectives.js";
+import { notify } from "../ui/notifications.js";
 import { showHud, hideHud, closePause, updateBattery, updateBlindfoldButton } from "../ui/hud.js";
 import { updateInventory, closeInventory } from "../ui/inventory.js";
 import { closeReadingModals } from "../ui/readers.js";
@@ -81,7 +82,7 @@ export function handleBookClosed(reachedEnd) {
 
 function showChapterEnd() {
     interruptGameplay();
-    completeObjective("ler-livro");
+    notify("Capítulo 1 encerrado", "Obrigado por jogar!");
 
     hideHud();
     hideScreens("interface");

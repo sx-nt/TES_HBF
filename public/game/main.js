@@ -5,6 +5,7 @@ import { SAFE_CODE } from "./data/scenes.js";
 import { skipTyping } from "./ui/dialogue.js";
 import { crtTransition } from "./ui/transitions.js";
 import { initObjectives } from "./ui/objectives.js";
+import { initNotifications } from "./ui/notifications.js";
 import { togglePause, saveGame, updateBlindfoldButton } from "./ui/hud.js";
 import { setOpenableItems, toggleInventory } from "./ui/inventory.js";
 import { initReaders, openDocumentViewer, openBookReader } from "./ui/readers.js";
@@ -33,6 +34,7 @@ setOpenableItems({
 initReaders({ onBookClosed: handleBookClosed });
 initSafePanel({ code: SAFE_CODE, onUnlock: unlockSafe });
 initObjectives();
+initNotifications();
 setupUiSounds();
 updateBlindfoldButton();
 

@@ -2,21 +2,26 @@
 // Módulo autocontido (estado, DOM e eventos próprios; estilos em
 // css/objectives.css). API pública: setObjective, completeObjective,
 // withObjective, resetObjectives, getObjectives, closeObjectives, initObjectives.
+//
+// Só entram aqui pedidos feitos por outros personagens (a máquina na praia,
+// O Agente nos portões...). Falas do MEE e do MEE SYSTEM não geram objetivos.
+// O aviso de novo objetivo é discreto: uma linha curta sob a barra superior
+// e um ponto vermelho no botão "Objetivos" até o painel ser aberto.
+import { notify } from "./notifications.js";
 
-const INITIAL_OBJECTIVE = { id: "destrocos", text: "Examine os destroços na praia" };
-const TOAST_MS = 3500;
+const NOTICE_MS = 2800;
+const EMPTY_TEXT = "Nenhum objetivo no momento";
 
 let objectives = [];
-let objectiveToastTimer = null;
+let noticeTimer = null;
 
 const byId = (id) => document.getElementById(id);
 
-// Objetivo inicial (definido sem notificação ao iniciar/reiniciar)
+// Começa sem objetivos: o primeiro vem da primeira conversa.
 export function resetObjectives() {
-    objectives = [{ ...INITIAL_OBJECTIVE, done: false }];
-    clearTimeout(objectiveToastTimer);
-    byId("objective-toast")?.classList.add("hidden");
-    byId("objectives-toggle")?.classList.remove("objective-pulse");
+    objectives = [];
+    hideNotice();
+    markUnseen(false);
     updateObjectives();
 }
 
@@ -31,7 +36,8 @@ export function setObjective(id, text) {
     objectives.push({ id, text, done: false });
 
     updateObjectives();
-    showObjectiveToast(text);
+    showNotice();
+    notify("Objetivo atualizado", text);
 }
 
 export function completeObjective(id) {
@@ -59,7 +65,8 @@ function updateObjectives() {
     if (!currentEl || !listEl) return;
 
     const current = [...objectives].reverse().find(objective => !objective.done);
-    currentEl.textContent = current ? current.text : "Nenhum objetivo no momento";
+    currentEl.textContent = current ? current.text : EMPTY_TEXT;
+    currentEl.classList.toggle("objective-empty", !current);
 
     listEl.replaceChildren();
     objectives.filter(objective => objective.done).forEach(objective => {
@@ -73,24 +80,30 @@ function updateObjectives() {
     byId("objectives-done-title")?.classList.toggle("hidden", !listEl.children.length);
 }
 
-function showObjectiveToast(text) {
-    const toast = byId("objective-toast");
-    const button = byId("objectives-toggle");
-    if (!toast) return;
+// AVISO DISCRETO
 
-    byId("objective-toast-text").textContent = text;
-    toast.classList.remove("hidden", "objective-toast-show");
-    void toast.offsetWidth;
-    toast.classList.add("objective-toast-show");
+function showNotice() {
+    const notice = byId("objective-notice");
+    markUnseen(true);
+    if (!notice) return;
 
-    if (button) {
-        button.classList.remove("objective-pulse");
-        void button.offsetWidth;
-        button.classList.add("objective-pulse");
-    }
+    notice.classList.remove("hidden", "objective-notice-show");
+    void notice.offsetWidth;
+    notice.classList.add("objective-notice-show");
 
-    clearTimeout(objectiveToastTimer);
-    objectiveToastTimer = setTimeout(() => toast.classList.add("hidden"), TOAST_MS);
+    clearTimeout(noticeTimer);
+    noticeTimer = setTimeout(hideNotice, NOTICE_MS);
+}
+
+function hideNotice() {
+    clearTimeout(noticeTimer);
+    const notice = byId("objective-notice");
+    notice?.classList.add("hidden");
+    notice?.classList.remove("objective-notice-show");
+}
+
+function markUnseen(unseen) {
+    byId("objectives-toggle")?.classList.toggle("objective-unseen", unseen);
 }
 
 function toggleObjectives() {
@@ -100,7 +113,10 @@ function toggleObjectives() {
 
     panel.classList.toggle("hidden", isOpen);
     button.setAttribute("aria-expanded", String(!isOpen));
-    button.classList.remove("objective-pulse");
+    if (!isOpen) {
+        markUnseen(false);
+        hideNotice();
+    }
 }
 
 export function closeObjectives() {
