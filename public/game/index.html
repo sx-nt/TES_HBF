@@ -92,14 +92,49 @@
         <div class="safe-card">
             <p class="safe-kicker">COFRE OCULTO</p>
             <h2>INSIRA A SENHA</h2>
-            <label for="safe-code">Código de cinco dígitos</label>
-            <input id="safe-code" inputmode="numeric" maxlength="5" autocomplete="off" aria-describedby="safe-feedback">
+            <label for="safe-code">Código de seis dígitos</label>
+            <input id="safe-code" inputmode="numeric" maxlength="6" autocomplete="off" aria-describedby="safe-feedback">
             <p id="safe-feedback" class="safe-feedback" role="status"></p>
             <div class="safe-actions">
                 <button id="safe-cancel" type="button">Voltar</button>
                 <button id="safe-submit" type="button">Confirmar</button>
             </div>
         </div>
+    </section>
+
+    <!-- DOCUMENTOS E LIVRO -->
+    <section id="document-viewer" class="reading-modal hidden" role="dialog" aria-modal="true" aria-labelledby="document-title">
+        <div class="overlay-card reading-card document-card">
+            <button id="document-close" class="overlay-close" type="button" aria-label="Fechar documento">×</button>
+            <p class="safe-kicker">ITEM DO INVENTÁRIO</p>
+            <h2 id="document-title">DOCUMENTO</h2>
+            <div class="document-frame">
+                <img id="document-image" src="assets/items/id.png" alt="Documento de identificação com foto, assinatura e uma data impressa: 03.03.3030">
+            </div>
+            <p class="reading-hint">Um documento de identidade. Há uma data impressa ao lado da foto.</p>
+        </div>
+    </section>
+
+    <section id="book-reader" class="reading-modal hidden" role="dialog" aria-modal="true" aria-labelledby="book-page-title">
+        <div class="overlay-card reading-card book-card">
+            <button id="book-close" class="overlay-close" type="button" aria-label="Fechar livro">×</button>
+            <p class="safe-kicker">LIVRO</p>
+            <h2 id="book-page-title"></h2>
+            <p id="book-page-text" aria-live="polite"></p>
+            <div class="book-controls">
+                <button id="book-prev" type="button">Anterior</button>
+                <span id="book-page-counter">1/1</span>
+                <button id="book-next" type="button">Próxima</button>
+                <button id="book-finish" class="hidden" type="button">Fechar livro</button>
+            </div>
+            <p class="reading-hint">Setas: virar página · Esc: fechar</p>
+        </div>
+    </section>
+
+    <section id="chapter-end" class="screen hidden" aria-label="Fim do capítulo">
+        <h1>CAPÍTULO 1 ENCERRADO</h1>
+        <p>Obrigado por jogar!</p>
+        <button id="chapter-end-restart" type="button">Jogar novamente</button>
     </section>
 
     <section id="dialogue" class="hidden">
