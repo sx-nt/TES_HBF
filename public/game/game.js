@@ -447,8 +447,8 @@ function updateSceneActions() {
     addAction("Examinar quadro", examinePicture);
         addAction("Examinar espelho", () => loadScene("mirror"));
         addAction("Examinar armário", examineCabinet);
-        if (windowsCovered && toolsExamined && hasHammer && hasNails) {
-            addAction("Ir para a construção", () => leaveHouse("construcao"));
+        if (windowsCovered && !blindfoldOn && toolsExamined && hasHammer && hasNails) {
+            addAction("Ir para a construção", () => loadScene("construcao"));
         }
         addAction("Voltar aos portões", returnToGates);
     }
@@ -843,8 +843,9 @@ function coverWindows() {
 }
 // SAIR DE CASA
 // Regra: o jogador só morre se sair de casa sem a venda.
-const OUTSIDE_HOUSE_SCENES = ["gates", "houseFront", "construcao"];
-const INSIDE_HOUSE_SCENES = ["quarto", "mirror", "ww", "quadroZoom", "cofre", "cofreAberto"];
+// A construção é acessada pelos fundos, sem humanos por perto: área segura sem a venda.
+const OUTSIDE_HOUSE_SCENES = ["gates", "houseFront"];
+const INSIDE_HOUSE_SCENES = ["quarto", "mirror", "ww", "quadroZoom", "cofre", "cofreAberto", "construcao"];
 
 function leaveHouse(sceneName, onLoaded = null) {
     if (!blindfoldOn) {
