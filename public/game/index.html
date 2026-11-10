@@ -86,6 +86,7 @@
             <h2>JOGO PAUSADO</h2>
             <button id="save-button" type="button">Salvar jogo</button>
             <p id="save-feedback" role="status" aria-live="polite"></p>
+            <button id="notifications-toggle" type="button" aria-pressed="false">Notificações: desativadas</button>
             <button id="resume-button" type="button">Continuar</button>
             <button id="pause-restart-button" type="button">Reiniciar</button>
         </div>
@@ -103,10 +104,7 @@
         </div>
     </aside>
 
-    <div id="objective-toast" class="hidden" role="status" aria-live="polite">
-        <span>NOVO OBJETIVO:</span>
-        <strong id="objective-toast-text"></strong>
-    </div>
+    <p id="objective-notice" class="hidden" role="status" aria-live="polite">Objetivo atualizado</p>
 
     <div id="interface" class="hidden">
         <button id="blindfold-button" class="hidden" type="button">Colocar venda</button>

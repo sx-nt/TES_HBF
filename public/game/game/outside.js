@@ -3,7 +3,7 @@ import { state } from "../core/state.js";
 import { getDialogue } from "../data/dialogues.js";
 import { GATES_OFFICER_IMAGE } from "../data/scenes.js";
 import { showDialogue, showChoiceDialogue, playDialogueSteps, setVoiceOverride } from "../ui/dialogue.js";
-import { setObjective, withObjective } from "../ui/objectives.js";
+import { setObjective, completeObjective, withObjective } from "../ui/objectives.js";
 import { addItem, hasItem } from "../ui/inventory.js";
 import { updateBattery } from "../ui/hud.js";
 import { loadScene, refreshSceneUI, swapBackground } from "./scene-loader.js";
@@ -26,7 +26,8 @@ export function examineDebris() {
         state.debrisExamined = true;
         state.machineZoomActive = false;
 
-        loadScene("beach", withObjective("venda", "Colete madeira e coloque a venda", refreshSceneUI));
+        // Pedido da máquina destruída
+        loadScene("beach", withObjective("madeira", "Colete madeira nos destroços antes de seguir", refreshSceneUI));
     });
 }
 
@@ -34,6 +35,7 @@ export function collectWood() {
     if (!state.debrisExamined || hasItem("madeira")) return;
 
     addItem("madeira");
+    completeObjective("madeira");
     state.battery = Math.max(0, state.battery - WOOD_BATTERY_COST);
     updateBattery();
     refreshSceneUI();
@@ -58,7 +60,7 @@ function followAgent() {
     loadScene("houseFront", () => {
         showDialogue([
             "A casa parece vazia... mas alguém esteve aqui recentemente."
-        ], withObjective("explorar-casa", "Explore a casa", refreshSceneUI), "MEE SYSTEM");
+        ], withObjective("aguardar-convocacao", "Aguarde em casa a convocação do Departamento", refreshSceneUI), "MEE SYSTEM");
     });
 }
 
@@ -72,6 +74,7 @@ function startGatesSequence() {
         swapBackground(GATES_OFFICER_IMAGE, async () => {
             await playDialogueSteps(officer.steps, dialogueActions);
 
+            // Pedido do Agente ao fim da conversa nos portões
             setObjective("seguir-agente", "Siga o Agente até a casa");
             showChoiceDialogue("O Agente espera você. Seguir agora?", [
                 { label: "Seguir O Agente", action: followAgent }
@@ -85,6 +88,7 @@ export function returnToGates() {
         swapBackground(GATES_OFFICER_IMAGE, () => {
             const warning = getDialogue("officerWarning");
             showDialogue(warning.lines, () => {
+                setObjective("ficar-em-casa", "Volte para casa e não saia sem motivo");
                 showChoiceDialogue("O Agente aguarda que você volte para casa.", [
                     { label: "Voltar para casa", action: () => loadScene("houseFront") }
                 ], "MEE SYSTEM");

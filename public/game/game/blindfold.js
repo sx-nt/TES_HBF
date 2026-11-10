@@ -6,7 +6,6 @@ import { state } from "../core/state.js";
 import { getDialogue } from "../data/dialogues.js";
 import { OUTSIDE_HOUSE_SCENES, INSIDE_HOUSE_SCENES } from "../data/scenes.js";
 import { showDialogue, closeDialogue } from "../ui/dialogue.js";
-import { withObjective } from "../ui/objectives.js";
 import { addItem } from "../ui/inventory.js";
 import { loadScene, refreshSceneUI, isInteractionBlocked } from "./scene-loader.js";
 import { gameOver } from "./flow.js";
@@ -33,7 +32,7 @@ export function equipBlindfold() {
                 "Quando equipada, as aparências já não são mais as mesmas...",
                 "Quando removida, segredos são revelados ...",
                 "CUIDADO: Nunca remova a venda perto de humanos!"
-            ], withObjective("portoes", "Vá até os portões", refreshSceneUI), "MEE SYSTEM");
+            ], refreshSceneUI, "MEE SYSTEM");
         }, "MEE");
     });
 }
