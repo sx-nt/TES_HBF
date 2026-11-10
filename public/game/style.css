@@ -1,4 +1,8 @@
 
+/* ========================================
+   CONFIGURAÇÕES GERAIS
+======================================== */
+    
 * {
     margin: 0;
     padding: 0;
@@ -6,18 +10,14 @@
     font-family: 'Silkscreen', monospace;
 }
 
-
-
 body {
     background-color: #111;
-    font-family: 'Silkscreen', monospace;
-    overflow: hidden;
     color: white;
+    overflow: hidden;
 }
 
 button {
     cursor: pointer;
-    font-family: 'Silkscreen', monospace;
     border: 1px solid #aaa;
     background: #242424;
     color: white;
@@ -33,23 +33,71 @@ button:hover {
     display: none !important;
 }
 
-/* JOGO */
+/* ========================================
+   JOGO
+======================================== */
 
 #game {
-    width: 100vw;
-    height: 100vh;
     position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
+    width: 100vw;
+    height: 100vh;
 }
 
-/* CENÁRIOS */
+/* ========================================
+   CENÁRIOS
+======================================== */
 
 #scene {
     position: relative;
     width: min(100vw, 220vh);
     aspect-ratio: 2048 / 682;
+}
+
+#background {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    image-rendering: pixelated;
+    opacity: 1;
+}
+
+#background.scene-enter {
+    animation: scene-fade-in 0.6s ease-out forwards;
+}
+
+#hotspots {
+    position: absolute;
+    inset: 0;
+}
+
+.hotspot {
+    position: absolute;
+    padding: 0;
+    border: none;
+    background: transparent;
+    outline: none;
+    box-shadow: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.hotspot:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.hotspot:focus,
+.hotspot:focus-visible,
+.hotspot:active {
+    outline: none;
+    box-shadow: none;
+}
+
+#scene.debug .hotspot {
+    background: rgba(0, 255, 0, 0.2);
+    outline: 1px solid lime;
 }
 
 #mirror-key-overlay {
@@ -64,38 +112,21 @@ button:hover {
     z-index: 2;
 }
 
-#background {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: fill;
-    image-rendering: pixelated;
+@keyframes scene-fade-in {
+    from {
+        opacity: 0;
+        filter: brightness(1.8);
+    }
+
+    to {
+        opacity: 1;
+        filter: brightness(1);
+    }
 }
 
-#hotspots {
-    position: absolute;
-    inset: 0;
-}
-
-.hotspot {
-    position: absolute;
-    padding: 0;
-    border: none;
-    background: transparent;
-}
-
-.hotspot:hover {
-    background: rgba(255, 255, 255, 0.08);
-}
-
-/* VISUALIZAR ÁREAS CLICÁVEIS DURANTE O DESENVOLVIMENTO */
-
-#scene.debug .hotspot {
-    background: rgba(0, 255, 0, 0.2);
-    outline: 1px solid lime;
-}
-
-/* INTERFACE */
+/* ========================================
+   INTERFACE E HUD
+======================================== */
 
 #interface {
     position: absolute;
@@ -107,17 +138,41 @@ button:hover {
     pointer-events: auto;
 }
 
+#top-hud {
+    position: absolute;
+    top: 18px;
+    left: 18px;
+    right: 18px;
+    z-index: 12;
+
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    pointer-events: none;
+}
+
+#top-hud > * {
+    pointer-events: auto;
+}
+
+#top-hud button {
+    padding: 8px 12px;
+    font-size: 11px;
+}
+
 #blindfold-button {
     position: absolute;
     top: 68px;
     left: 24px;
-    right: auto;
+    z-index: 13;
+
     display: inline-flex;
     align-items: center;
     gap: 8px;
+
     padding: 7px 12px;
     font-size: 11px;
-    z-index: 13;
 }
 
 #blindfold-button img {
@@ -127,48 +182,116 @@ button:hover {
     image-rendering: pixelated;
 }
 
+#battery-meter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+    padding: 7px 10px;
+
+    background: rgba(10, 10, 10, 0.86);
+    border: 1px solid #777;
+    font-size: 10px;
+}
+
+.battery-track {
+    width: 92px;
+    height: 9px;
+    border: 1px solid #aaa;
+    background: #201b1b;
+}
+
+#battery-level {
+    width: 100%;
+    height: 100%;
+    background: #bd9c9c;
+    transition: width 0.25s ease, background 0.25s ease;
+}
+
+#battery-level[style*="width: 20%"],
+#battery-level[style*="width: 0%"] {
+    background: #a52d2d;
+}
+
 #scene-actions {
     position: absolute;
     bottom: 25px;
     left: 25px;
+
     display: flex;
-    gap: 10px;
     flex-wrap: wrap;
+    gap: 10px;
+
+    transition: opacity 0.2s ease;
 }
+
+/* ========================================
+   INVENTÁRIO
+======================================== */
 
 #inventory {
     position: absolute;
     inset: 0;
-    z-index: 20;
+    z-index: 30;
+
     display: grid;
     place-items: center;
+
     padding: 24px;
     background: rgba(0, 0, 0, 0.72);
     color: #d8d8d8;
     font-size: 12px;
+
     pointer-events: auto;
 }
 
-#inventory.hidden { display: none; }
-
-.overlay-card,
-.pause-card {
-    position: relative;
-    width: min(560px, 90vw);
-    padding: 28px;
-    background: rgba(16, 16, 16, 0.98);
-    border: 1px solid #777;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
-}
-
 #inventory .overlay-card {
+    position: relative;
     width: min(920px, 92vw);
     max-height: min(760px, 88vh);
     overflow: auto;
     padding: 34px;
+
     background: #2b2b2d;
     border: 2px solid #17171a;
-    box-shadow: 0 0 0 10px #55565c, 0 18px 50px rgba(0, 0, 0, 0.7);
+    box-shadow:
+        0 0 0 10px #55565c,
+        0 18px 50px rgba(0, 0, 0, 0.7);
+}
+
+#inventory span {
+    display: block;
+    color: #bd9c9c;
+    margin-bottom: 20px;
+}
+
+.inventory-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.inventory-item {
+    min-height: 142px;
+
+    display: grid;
+    place-items: center;
+    gap: 8px;
+
+    padding: 14px 10px;
+
+    border: 2px solid #17171a;
+    background: #39393f;
+    box-shadow: inset 0 0 0 2px #55565c;
+
+    text-align: center;
+}
+
+.inventory-item img {
+    width: 78px;
+    height: 78px;
+    object-fit: contain;
+    image-rendering: pixelated;
 }
 
 #inventory .overlay-close {
@@ -183,94 +306,107 @@ button:hover {
     outline-offset: 3px;
 }
 
-#inventory span {
-    display: block;
+/* ========================================
+   PAUSA
+======================================== */
+
+#pause-menu {
+    position: absolute;
+    inset: 0;
+    z-index: 40;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 12px;
+
+    padding: 24px;
+    background: rgba(0, 0, 0, 0.78);
+    pointer-events: auto;
+}
+
+.pause-card {
+    position: relative;
+    width: min(560px, 90vw);
+    padding: 28px;
+
+    display: grid;
+    gap: 12px;
+
+    background: rgba(16, 16, 16, 0.98);
+    border: 1px solid #777;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+
+    text-align: center;
+}
+
+#pause-menu h2 {
     color: #bd9c9c;
-    margin-bottom: 20px;
+    font-size: 20px;
+    margin-bottom: 8px;
+}
+
+#save-feedback {
+    min-height: 1em;
+    color: #bd9c9c;
+}
+
+#game.paused #scene,
+#game.paused #interface,
+#game.paused #dialogue {
+    filter: brightness(0.35);
+}
+
+/* ========================================
+   PAINÉIS E BOTÕES DE FECHAMENTO
+======================================== */
+
+.overlay-card {
+    position: relative;
+    width: min(560px, 90vw);
+    padding: 28px;
+
+    background: rgba(16, 16, 16, 0.98);
+    border: 1px solid #777;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
 }
 
 .overlay-close {
     position: absolute;
     top: 12px;
     right: 14px;
+
     padding: 2px 8px;
     font-size: 22px;
     line-height: 1;
 }
 
-.inventory-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 12px;
-}
-
-.inventory-item {
-    min-height: 142px;
-    display: grid;
-    place-items: center;
-    gap: 8px;
-    padding: 14px 10px;
-    border: 2px solid #17171a;
-    background: #39393f;
-    box-shadow: inset 0 0 0 2px #55565c;
-    text-align: center;
-}
-
-.inventory-item img {
-    width: 78px;
-    height: 78px;
-    object-fit: contain;
-    image-rendering: pixelated;
-}
-
-@media (max-width: 680px) {
-    .inventory-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    #inventory .overlay-card {
-        padding: 28px 18px;
-    }
-}
-
-#pause-menu {
-    display: grid;
-    place-items: center;
-    padding: 24px;
-    background: rgba(0, 0, 0, 0.72);
-    pointer-events: auto;
-}
-
-#pause-menu.hidden { display: none; }
-
-.pause-card {
-    display: grid;
-    gap: 12px;
-    text-align: center;
-}
-
-#save-feedback { min-height: 1em; color: #bd9c9c; }
-
-
-/* BOOT E GAME OVER */
+/* ========================================
+   TELA DE BOOT E GAME OVER
+======================================== */
 
 .screen {
     position: absolute;
     inset: 0;
-    background: #101410;
-    color: #e72626;
+    z-index: 10;
+
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    z-index: 10;
+
+    background: #101410;
+    color: #e72626;
 }
 
 .terminal {
     width: min(700px, 85%);
+
     display: flex;
     flex-direction: column;
     gap: 20px;
+
     line-height: 1.8;
 }
 
@@ -289,7 +425,6 @@ button:hover {
     font-weight: bold;
     margin-top: 15px;
 }
-
 
 .progress-bar {
     width: 100%;
@@ -315,14 +450,101 @@ button:hover {
     color: #b83232;
 }
 
-/* COFRE */
+/* ========================================
+   TELA INICIAL
+======================================== */
+
+#start-screen {
+    position: absolute;
+    inset: 0;
+    z-index: 15;
+
+    background-image:
+        linear-gradient(
+            rgba(0, 0, 0, 0.45),
+            rgba(0, 0, 0, 0.45)
+        ),
+        url("assets/images/start_background.png");
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    color: #a5a5a5;
+}
+
+.start-version {
+    position: absolute;
+    top: 12%;
+    left: 50%;
+    transform: translateX(-50%);
+
+    font-size: clamp(10px, 1.4vw, 20px);
+    white-space: nowrap;
+    color: #858585;
+}
+
+.start-content {
+    position: absolute;
+    top: 58%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+
+    width: 95%;
+    text-align: center;
+}
+
+.start-content h1 {
+    color: #b20e13;
+    font-size: clamp(17px, 3.2vw, 48px);
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+#start-button {
+    border: none;
+    background: transparent;
+    color: #b20e13;
+
+    font-size: clamp(17px, 2.7vw, 38px);
+    padding: 0;
+
+    transition: color 0.2s, text-shadow 0.2s;
+}
+
+#start-button:hover {
+    color: #e3262b;
+    text-shadow: 0 0 12px rgba(178, 14, 19, 0.5);
+}
+
+.start-copyright {
+    position: absolute;
+    bottom: 12%;
+    left: 50%;
+    transform: translateX(-50%);
+
+    color: #858585;
+    font-size: clamp(10px, 1.4vw, 20px);
+    white-space: nowrap;
+}
+
+/* ========================================
+   COFRE
+======================================== */
 
 #safe-panel {
     position: absolute;
     inset: 0;
-    z-index: 20;
+    z-index: 35;
+
     display: grid;
     place-items: center;
+
     background: rgba(5, 7, 9, 0.72);
     backdrop-filter: blur(2px);
 }
@@ -330,6 +552,7 @@ button:hover {
 .safe-card {
     width: min(430px, calc(100% - 32px));
     padding: 26px;
+
     border: 1px solid #9b7777;
     background: #111215;
     box-shadow: 0 18px 60px rgba(0, 0, 0, 0.7);
@@ -370,89 +593,150 @@ button:hover {
     font-size: 11px;
 }
 
-.safe-feedback.error { color: #e18484; }
-.safe-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 12px; }
+.safe-feedback.error {
+    color: #e18484;
+}
 
-/* DIÁLOGOS */
+.safe-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+/* ========================================
+   DIÁLOGOS
+======================================== */
 
 #dialogue {
     position: absolute;
     bottom: 24px;
     left: max(14px, 3vw);
+    z-index: 25;
+
     width: calc(100% - max(28px, 6vw));
     height: 156px;
     min-height: 156px;
     max-height: 156px;
-    padding: 14px 18px 16px;
-    background: rgba(10, 10, 10, 0.96);
-    border: 1px solid #777;
-    z-index: 7;
+
     display: flex;
     flex-direction: column;
     gap: 8px;
+
+    padding: 14px 18px 16px;
+
+    background: rgba(10, 10, 10, 0.96);
+    border: 1px solid #777;
+
     overflow: hidden;
+    pointer-events: auto;
 }
 
 #dialogue-speaker {
     color: #bd9c9c;
     font-weight: bold;
     font-size: 13px;
+    text-transform: uppercase;
 }
 
 #dialogue-text {
-    line-height: 1.6;
+    opacity: 1;
     font-size: 15px;
+    line-height: 1.6;
+    transition: opacity 0.4s ease;
+}
+
+#dialogue-text.fade-out {
+    opacity: 0;
+}
+
+#dialogue-text.mee-speech {
+    color: #a50707;
+    text-shadow: 0 0 5px rgba(230, 168, 168, 0.3);
 }
 
 #dialogue-next {
     align-self: flex-end;
-    font-family: 'Silkscreen', monospace;
 }
 
 #dialogue-choices {
     display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    gap: 8px;
+    flex-direction: column;
+    gap: 10px;
     width: 100%;
-    margin-top: auto;
 }
 
 #dialogue-choices button {
-    flex: 1 1 0;
-    min-width: 0;
+    width: 100%;
     min-height: 46px;
-    padding: 12px 16px;
+    padding: 12px;
+
+    background: #171717;
+    border: 1px solid #777;
+    color: #ccc;
+
+    font-family: 'Silkscreen', monospace;
     font-size: 12px;
     line-height: 1.35;
+    text-align: left;
+
     white-space: normal;
     overflow-wrap: anywhere;
 }
 
-#blindfold-button {
+#dialogue-choices button:hover {
+    border-color: #a52d2d;
+    color: #a52d2d;
+}
+
+#dialogue-skip-hint {
+    color: #777;
+    font-size: 10px;
+    text-align: left;
+}
+
+/* ========================================
+   BLOQUEIO DURANTE DIÁLOGOS
+======================================== */
+
+#game.dialogue-active #scene {
+    pointer-events: none;
+}
+
+#game.dialogue-active #scene-actions,
+#game.dialogue-active #blindfold-button {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* ========================================
+   VENDA EQUIPADA
+======================================== */
+
+#game.blindfold-active::after {
+    content: "";
     position: absolute;
-    top: 68px;
-    left: 24px;
-    right: auto;
-    z-index: 13;
-    padding: 7px 12px;
-    font-size: 11px;
+    inset: 0;
+    z-index: 3;
+
+    background: rgba(0, 0, 0, 0.38);
+    pointer-events: none;
+
+    transition: background 0.3s ease;
 }
 
-@media (max-width: 640px) {
-    #blindfold-button { top: 62px; left: 10px; padding: 6px 9px; font-size: 10px; }
-    #dialogue-choices { gap: 6px; }
-    #dialogue-choices button { min-height: 42px; padding: 10px 12px; font-size: 11px; }
-}
-
-/* CRT OVERLAY */
+/* ========================================
+   EFEITO CRT
+======================================== */
 
 #crt-overlay {
     position: absolute;
     inset: 0;
-    z-index: 20;
-    pointer-events: none;
+    z-index: 50;
+
     overflow: hidden;
+    pointer-events: none;
 
     background:
         repeating-linear-gradient(
@@ -475,60 +759,6 @@ button:hover {
     animation: crt-flicker 0.15s infinite;
 }
 
-/* CRT TRANSITION */
-
-#crt-transition {
-    position: absolute;
-    inset: 0;
-    z-index: 100;
-
-    background: #000;
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-
-    transition: opacity 0.45s ease;
-}
-
-#crt-transition.cover {
-    visibility: visible;
-    opacity: 1;
-    transition: opacity 0.18s ease;
-}
-
-#crt-transition.reveal {
-    visibility: visible;
-    opacity: 0;
-    transition: opacity 0.45s ease;
-}
-
-#background {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    image-rendering: pixelated;
-    opacity: 1;
-}
-
-#background.scene-enter {
-    animation: scene-fade-in 0.6s ease-out forwards;
-}
-
-@keyframes scene-fade-in {
-    from {
-        opacity: 0;
-        filter: brightness(1.8);
-    }
-
-    to {
-        opacity: 1;
-        filter: brightness(1);
-    }
-}
-
-/* BRILHO E DISTORÇÃO DISCRETA */
-
 #crt-overlay::before {
     content: "";
     position: absolute;
@@ -545,13 +775,12 @@ button:hover {
     animation: crt-shift 8s linear infinite;
 }
 
-/* PEQUENA FALHA DE IMAGEM */
-
 #crt-overlay::after {
     content: "";
     position: absolute;
     top: 0;
     left: -100%;
+
     width: 100%;
     height: 100%;
 
@@ -595,7 +824,108 @@ button:hover {
     }
 }
 
+/* ========================================
+   TRANSIÇÃO CRT
+======================================== */
 
+#crt-transition {
+    position: absolute;
+    inset: 0;
+    z-index: 100;
+
+    background: #000;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    transition: opacity 0.45s ease;
+}
+
+#crt-transition.cover {
+    visibility: visible;
+    opacity: 1;
+    transition: opacity 0.18s ease;
+}
+
+#crt-transition.reveal {
+    visibility: visible;
+    opacity: 0;
+    transition: opacity 0.45s ease;
+}
+
+/* ========================================
+   RESPONSIVIDADE
+======================================== */
+
+@media (max-width: 680px) {
+    .inventory-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    #inventory .overlay-card {
+        padding: 28px 18px;
+    }
+}
+
+@media (max-width: 640px) {
+    #top-hud {
+        top: 10px;
+        left: 10px;
+        right: 10px;
+    }
+
+    #top-hud button {
+        padding: 7px 8px;
+        font-size: 9px;
+    }
+
+    .battery-track {
+        width: 58px;
+    }
+
+    #battery-meter span {
+        display: none;
+    }
+
+    #blindfold-button {
+        top: 62px;
+        left: 10px;
+        padding: 6px 9px;
+        font-size: 10px;
+    }
+
+    #dialogue {
+        bottom: 16px;
+        left: 10px;
+
+        width: calc(100% - 20px);
+        height: 132px;
+        min-height: 132px;
+        max-height: 132px;
+
+        padding: 12px 13px 14px;
+    }
+
+    #dialogue-text {
+        font-size: 12px;
+        line-height: 1.45;
+    }
+
+    #dialogue-next {
+        padding: 8px 12px;
+        font-size: 11px;
+    }
+
+    #dialogue-choices {
+        gap: 6px;
+    }
+
+    #dialogue-choices button {
+        min-height: 42px;
+        padding: 10px 12px;
+        font-size: 11px;
+    }
+}
 
 @media (prefers-reduced-motion: reduce) {
     #crt-overlay,
@@ -603,308 +933,4 @@ button:hover {
     #crt-overlay::after {
         animation: none;
     }
-}
-
-
-/* START SCREEN */
-
-#start-screen {
-    position: absolute;
-    inset: 0;
-    z-index: 15;
-
-    background-image:
-        linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)),
-        url("assets/images/start_background.png");
-
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-
-    color: #a5a5a5;
-    font-family: 'Silkscreen', monospace;
-}
-
-/* VERSÃO */
-
-.start-version {
-    position: absolute;
-    top: 12%;
-    left: 50%;
-    transform: translateX(-50%);
-
-    font-size: clamp(10px, 1.4vw, 20px);
-    white-space: nowrap;
-    color: #858585;
-}
-
-/* TÍTULO E BOTÃO */
-
-.start-content {
-    position: absolute;
-    top: 58%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
-
-    width: 95%;
-    text-align: center;
-}
-
-.start-content h1 {
-    color: #b20e13;
-    font-size: clamp(17px, 3.2vw, 48px);
-    font-weight: 700;
-    white-space: nowrap;
-}
-
-/* BOTÃO START */
-
-#start-button {
-    border: none;
-    background: transparent;
-
-    color: #b20e13;
-    font-family: 'Silkscreen', monospace;
-    font-size: clamp(17px, 2.7vw, 38px);
-
-    padding: 0;
-    cursor: pointer;
-
-    transition: color 0.2s, text-shadow 0.2s;
-}
-
-#start-button:hover {
-    color: #e3262b;
-    text-shadow: 0 0 12px rgba(178, 14, 19, 0.5);
-}
-
-/* COPYRIGHT */
-
-.start-copyright {
-    position: absolute;
-    bottom: 12%;
-    left: 50%;
-    transform: translateX(-50%);
-
-    color: #858585;
-    font-size: clamp(10px, 1.4vw, 20px);
-    white-space: nowrap;
-}
-
-
-#dialogue-choices {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    width: 100%;
-}
-
-#dialogue-choices button {
-    font-family: 'Silkscreen', monospace;
-    text-align: left;
-    background: #171717;
-    border: 1px solid #777;
-    color: #ccc;
-    padding: 12px;
-    cursor: pointer;
-}
-
-#dialogue-choices button:hover {
-    border-color: #a52d2d;
-    color: #a52d2d;
-}
-
-#dialogue-text {
-    opacity: 1;
-    transition: opacity 0.4s ease;
-}
-
-#dialogue-text.fade-out {
-    opacity: 0;
-}
-
-#dialogue {
-    transition: none;
-}
-
-#scene-actions {
-    transition: opacity 0.2s ease;
-}
-
-#game.dialogue-active #scene-actions, #blindfold-button {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-}
-
-#dialogue-skip-hint {
-    color: #777;
-    font-size: 10px;
-    text-align: left;
-}
-
-#top-hud {
-    position: absolute;
-    top: 18px;
-    left: 18px;
-    right: 18px;
-    z-index: 12;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    pointer-events: none;
-}
-
-#top-hud > * { pointer-events: auto; }
-
-#top-hud button {
-    padding: 8px 12px;
-    font-size: 11px;
-}
-
-#battery-meter {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-left: auto;
-    padding: 7px 10px;
-    background: rgba(10, 10, 10, 0.86);
-    border: 1px solid #777;
-    font-size: 10px;
-}
-
-.battery-track {
-    width: 92px;
-    height: 9px;
-    border: 1px solid #aaa;
-    background: #201b1b;
-}
-
-#battery-level {
-    width: 100%;
-    height: 100%;
-    background: #bd9c9c;
-    transition: width 0.25s ease, background 0.25s ease;
-}
-
-#battery-level[style*="width: 20%"], #battery-level[style*="width: 0%"] {
-    background: #a52d2d;
-}
-
-#inventory {
-    top: 62px;
-    left: 18px;
-    z-index: 13;
-    min-width: 170px;
-}
-
-#pause-menu {
-    position: absolute;
-    inset: 0;
-    z-index: 14;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    gap: 12px;
-    background: rgba(0, 0, 0, 0.78);
-}
-
-#pause-menu h2 {
-    color: #bd9c9c;
-    font-size: 20px;
-    margin-bottom: 8px;
-}
-
-#game.paused #scene,
-#game.paused #interface,
-#game.paused #dialogue {
-    filter: brightness(0.35);
-}
-
-#game.blindfold-active::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: 3;
-    pointer-events: none;
-    background: rgba(0, 0, 0, 0.38);
-    transition: background 0.3s ease;
-}
-
-@media (max-width: 640px) {
-    #top-hud { top: 10px; left: 10px; right: 10px; }
-    #top-hud button { padding: 7px 8px; font-size: 9px; }
-    .battery-track { width: 58px; }
-    #battery-meter span { display: none; }
-#dialogue {
-  bottom: 16px;
-  left: 10px;
-  width: calc(100% - 20px);
-  height: 132px;
-  min-height: 132px;
-  max-height: 132px;
-  padding: 12px 13px 14px;
-  }
-#dialogue-text { font-size: 12px; line-height: 1.45; }
-    #dialogue-next { padding: 8px 12px; font-size: 11px; }
-}
-
-/* Bloqueia os cliques no cenário durante os diálogos */
-#game.dialogue-active #scene {
-    pointer-events: none;
-}
-
-/* Mantém a caixa de diálogo clicável */
-#dialogue {
-    pointer-events: auto;
-}
-
-/* Esconde e bloqueia os botões de ação */
-/* Esconde os elementos atrás da caixa durante o diálogo */
-#game.dialogue-active #scene-actions,
-#game.dialogue-active #blindfold-button {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-}
-
-/* Volta a mostrar os elementos quando o diálogo termina */
-#scene-actions,
-#blindfold-button {
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
-}
-
-.hotspot {
-    outline: none;
-    box-shadow: none;
-    -webkit-tap-highlight-color: transparent;
-}
-
-.hotspot:focus,
-.hotspot:focus-visible,
-.hotspot:active {
-    outline: none;
-    box-shadow: none;
-}
-
-/* Diferencia o texto quando o MEE está falando */
-#dialogue-text.mee-speech {
-    color: #a50707; 
-    text-shadow: 0 0 5px rgba(230, 168, 168, 0.3);
-}
-
-/* Garante que o speaker (nome) também fique bonito */
-#dialogue-speaker {
-    color: #bd9c9c;
-    font-weight: bold;
-    font-size: 13px;
-    text-transform: uppercase;
 }

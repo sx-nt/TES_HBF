@@ -7,15 +7,7 @@ const scenes = {
             blindfolded: "assets/maps/C_Venda/beach_d_com_venda.png",
             unblindfolded: "assets/maps/S_Venda/beach_d_sem_venda.png"
         },
-        hotspots: [
-            {
-                x: 47,
-                y: 58,
-                width: 24,
-                height: 36,
-                action: examineDebris
-            }
-        ]
+        hotspots: []
     },
 
     gates: {
@@ -313,6 +305,10 @@ function loadScene(sceneName, onLoaded = null) {
         imagePath = "assets/maps/S_Venda/quarto_sem_venda_cofre.png";
     }
 
+    if (sceneName === "beach" && machineZoomActive && !blindfoldOn) {
+    imagePath = "assets/maps/S_Venda/maquina_zoom_sem_venda.png";
+}
+
     if (sceneName === "construcao" && machineZoomActive && !blindfoldOn) {
         imagePath = "assets/maps/S_Venda/maquina_zoom_sem_venda.png";
     }
@@ -479,20 +475,35 @@ function addAction(label, callback) {
 function updateInventory() {
     const itemsEl = document.getElementById("inventory-items");
     if (!itemsEl) return;
+
     itemsEl.replaceChildren();
+
     if (!inventory.length) {
         itemsEl.textContent = "Vazio";
         return;
     }
 
+    // Imagens dos itens do inventário
+    const itemImages = {
+        "livro": "assets/items/book.png",
+        "chave do armário": "assets/items/chave.png",
+        "venda": "assets/items/venda.png",
+        "madeira": "assets/items/madeira.png",
+        "martelo": "assets/items/ferramentas.png",
+        "senha do cofre": "assets/items/chave.png"
+    };
+
     inventory.forEach((item) => {
         const card = document.createElement("div");
         card.className = "inventory-item";
+
         const image = document.createElement("img");
-        image.src = item === "chave do armário" ? "assets/items/chave.png" : "assets/images/eye_open_icon.png";
+        image.src = itemImages[item];
         image.alt = item;
+
         const label = document.createElement("span");
         label.textContent = item.toUpperCase();
+
         card.append(image, label);
         itemsEl.appendChild(card);
     });
@@ -509,7 +520,9 @@ function updateBattery() {
 function toggleInventory() {
     const panel = document.getElementById("inventory");
     const button = document.getElementById("inventory-toggle");
+
     const isOpen = !panel.classList.contains("hidden");
+
     panel.classList.toggle("hidden", isOpen);
     button.setAttribute("aria-expanded", String(!isOpen));
 }
@@ -543,21 +556,38 @@ function togglePause() {
     document.getElementById("game").classList.toggle("paused", isPaused);
 }
 
-function examineDebris() {
+async function examineDebris() {
     if (debrisExamined) return;
+
     computerExamined = true;
-    const dialogue = getDialogue("computerIntro");
-    playDialogueSteps(dialogue.steps).then(() => {
+    machineZoomActive = true;
+
+    // Carrega a cena da praia com o zoom da máquina
+    loadScene("beach", async () => {
+        const dialogue = getDialogue("computerIntro");
+
+        await playDialogueSteps(dialogue.steps);
+
+        // Finaliza a interação
         debrisExamined = true;
+        machineZoomActive = false;
+
+        // Retorna à praia normal
         loadScene("beach", updateSceneActions);
     });
 }
 
 function receiveBlindfold() {
-    if (!debrisExamined || !inventory.includes("madeira") || hasBlindfold) return;
+    if (hasBlindfold) return;
 
     hasBlindfold = true;
     blindfoldOn = true;
+    
+
+    // Adiciona a venda ao inventário
+    inventory.push("venda");
+    updateInventory();
+
     loadScene("beach", () => {
         showDialogue([
             "A venda foi ativada.",
@@ -631,7 +661,7 @@ function collectTools() {
     if (!toolsExamined || (hasHammer && hasNails)) return;
     hasHammer = true;
     hasNails = true;
-    inventory.push("martelo", "pregos");
+    inventory.push("martelo");
     updateInventory();
     showDialogue(["Martelo e pregos adicionados ao inventário."], updateSceneActions, "MEE SYSTEM");
 }
@@ -1061,6 +1091,11 @@ function activateBlindfold() {
 
     hasBlindfold = true;
     blindfoldOn = true;
+
+    if (!inventory.includes("venda")) {
+        inventory.push("venda");
+        updateInventory();
+    }
 
     closeDialogue();
 
