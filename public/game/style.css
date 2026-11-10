@@ -112,9 +112,19 @@ button:hover {
     top: 68px;
     left: 24px;
     right: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     padding: 7px 12px;
     font-size: 11px;
     z-index: 13;
+}
+
+#blindfold-button img {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+    image-rendering: pixelated;
 }
 
 #scene-actions {
@@ -151,6 +161,28 @@ button:hover {
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
 }
 
+#inventory .overlay-card {
+    width: min(920px, 92vw);
+    max-height: min(760px, 88vh);
+    overflow: auto;
+    padding: 34px;
+    background: #2b2b2d;
+    border: 2px solid #17171a;
+    box-shadow: 0 0 0 10px #55565c, 0 18px 50px rgba(0, 0, 0, 0.7);
+}
+
+#inventory .overlay-close {
+    color: #f1f1f1;
+    background: #19191c;
+    border: 2px solid #55565c;
+}
+
+#inventory .overlay-close:focus-visible,
+#inventory .inventory-item:focus-visible {
+    outline: 3px solid #d3b37a;
+    outline-offset: 3px;
+}
+
 #inventory span {
     display: block;
     color: #bd9c9c;
@@ -168,26 +200,37 @@ button:hover {
 
 .inventory-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(112px, 1fr));
-    gap: 14px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
 }
 
 .inventory-item {
-    min-height: 112px;
+    min-height: 142px;
     display: grid;
     place-items: center;
     gap: 8px;
-    padding: 12px;
-    border: 1px solid #464646;
-    background: #202020;
+    padding: 14px 10px;
+    border: 2px solid #17171a;
+    background: #39393f;
+    box-shadow: inset 0 0 0 2px #55565c;
     text-align: center;
 }
 
 .inventory-item img {
-    width: 58px;
-    height: 58px;
+    width: 78px;
+    height: 78px;
     object-fit: contain;
     image-rendering: pixelated;
+}
+
+@media (max-width: 680px) {
+    .inventory-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    #inventory .overlay-card {
+        padding: 28px 18px;
+    }
 }
 
 #pause-menu {
