@@ -128,20 +128,85 @@ button:hover {
 
 #inventory {
     position: absolute;
-    top: 24px;
-    left: 24px;
-    z-index: 8;
-    padding: 10px 14px;
-    background: rgba(10, 10, 10, 0.86);
-    border: 1px solid #777;
+    inset: 0;
+    z-index: 20;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: rgba(0, 0, 0, 0.72);
     color: #d8d8d8;
     font-size: 12px;
+    pointer-events: auto;
+}
+
+#inventory.hidden { display: none; }
+
+.overlay-card,
+.pause-card {
+    position: relative;
+    width: min(560px, 90vw);
+    padding: 28px;
+    background: rgba(16, 16, 16, 0.98);
+    border: 1px solid #777;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
 }
 
 #inventory span {
+    display: block;
     color: #bd9c9c;
-    margin-right: 10px;
+    margin-bottom: 20px;
 }
+
+.overlay-close {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    padding: 2px 8px;
+    font-size: 22px;
+    line-height: 1;
+}
+
+.inventory-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(112px, 1fr));
+    gap: 14px;
+}
+
+.inventory-item {
+    min-height: 112px;
+    display: grid;
+    place-items: center;
+    gap: 8px;
+    padding: 12px;
+    border: 1px solid #464646;
+    background: #202020;
+    text-align: center;
+}
+
+.inventory-item img {
+    width: 58px;
+    height: 58px;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+#pause-menu {
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: rgba(0, 0, 0, 0.72);
+    pointer-events: auto;
+}
+
+#pause-menu.hidden { display: none; }
+
+.pause-card {
+    display: grid;
+    gap: 12px;
+    text-align: center;
+}
+
+#save-feedback { min-height: 1em; color: #bd9c9c; }
 
 
 /* BOOT E GAME OVER */

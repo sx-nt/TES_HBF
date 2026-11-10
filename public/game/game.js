@@ -477,12 +477,25 @@ function addAction(label, callback) {
 
 
 function updateInventory() {
-    const inventoryEl = document.getElementById("inventory");
     const itemsEl = document.getElementById("inventory-items");
-    if (!inventoryEl || !itemsEl) return;
-    itemsEl.textContent = inventory.length
-        ? inventory.map(item => item.toUpperCase()).join(" • ")
-        : "Vazio";
+    if (!itemsEl) return;
+    itemsEl.replaceChildren();
+    if (!inventory.length) {
+        itemsEl.textContent = "Vazio";
+        return;
+    }
+
+    inventory.forEach((item) => {
+        const card = document.createElement("div");
+        card.className = "inventory-item";
+        const image = document.createElement("img");
+        image.src = item === "chave do armário" ? "assets/items/chave.png" : "assets/images/eye_open_icon.png";
+        image.alt = item;
+        const label = document.createElement("span");
+        label.textContent = item.toUpperCase();
+        card.append(image, label);
+        itemsEl.appendChild(card);
+    });
 }
 
 function updateBattery() {
@@ -499,6 +512,35 @@ function toggleInventory() {
     const isOpen = !panel.classList.contains("hidden");
     panel.classList.toggle("hidden", isOpen);
     button.setAttribute("aria-expanded", String(!isOpen));
+}
+
+function updateBlindfoldButton() {
+    const button = document.getElementById("blindfold-button");
+    if (!button) return;
+    button.replaceChildren();
+    const image = document.createElement("img");
+    image.src = blindfoldOn ? "assets/images/eye_closed_icon.png" : "assets/images/eye_open_icon.png";
+    image.alt = blindfoldOn ? "Colocar venda" : "Retirar venda";
+    button.appendChild(image);
+    button.setAttribute("aria-label", blindfoldOn ? "Retirar venda" : "Colocar venda");
+}
+
+function toggleBlindfold() {
+    if (!hasBlindfold) return;
+    blindfoldOn = !blindfoldOn;
+    updateBlindfoldButton();
+    loadScene(currentScene, updateSceneActions);
+}
+
+function saveGame() {
+    const saveState = {
+        blindfoldOn, hasBlindfold, computerExamined, debrisExamined, inventory,
+        gatesReady, toolsExamined, hasHammer, hasNails, windowsExamined, windowsCovered,
+        pictureExamined, safeOpen, bookCollected, keyCollected, cabinetUnlocked,
+        passwordFound, machineExamined, machineZoomActive, battery, currentScene
+    };
+    localStorage.setItem("mee-save", JSON.stringify(saveState));
+    document.getElementById("save-feedback").textContent = "Jogo salvo neste navegador.";
 }
 
 function togglePause() {
@@ -1098,6 +1140,7 @@ machineExamined = false;
     document.getElementById("pause-menu").classList.add("hidden");
     updateInventory();
     updateBattery();
+    updateBlindfoldButton();
 
     if (bootInterval !== null) {
         clearInterval(bootInterval);
@@ -1130,6 +1173,9 @@ document.getElementById("safe-code").addEventListener("keydown", (event) => {
 });
 document.getElementById("blindfold-button").addEventListener("click", toggleBlindfold);
 document.getElementById("inventory-toggle").addEventListener("click", toggleInventory);
+document.getElementById("inventory-close").addEventListener("click", toggleInventory);
+document.getElementById("save-button").addEventListener("click", saveGame);
+updateBlindfoldButton();
 document.getElementById("pause-button").addEventListener("click", togglePause);
 document.getElementById("resume-button").addEventListener("click", togglePause);
 document.getElementById("pause-restart-button").addEventListener("click", () => {
