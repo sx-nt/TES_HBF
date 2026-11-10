@@ -114,11 +114,12 @@ let keyCollected = false;
 let cabinetUnlocked = false;
 let passwordFound = false;
 let machineExamined = false;
-  let machineZoomActive = false;
-  let battery = 100;
+let machineZoomActive = false;
+let battery = 100;
 let isPaused = false;
 let bootInterval = null;
-
+let typingVoice = null;
+let activeVoiceOverride = null;
 
 // FUNÇÕES AUXILIARES
 
@@ -562,17 +563,18 @@ async function examineDebris() {
     computerExamined = true;
     machineZoomActive = true;
 
-    // Carrega a cena da praia com o zoom da máquina
     loadScene("beach", async () => {
         const dialogue = getDialogue("computerIntro");
 
+        activeVoiceOverride = "machine";
+
         await playDialogueSteps(dialogue.steps);
 
-        // Finaliza a interação
+        activeVoiceOverride = null;
+
         debrisExamined = true;
         machineZoomActive = false;
 
-        // Retorna à praia normal
         loadScene("beach", updateSceneActions);
     });
 }
@@ -628,14 +630,12 @@ function startGatesSequence() {
                             gatesReady = true;
                             loadScene("houseFront", () => {
                                 showDialogue([
-                                    "MEE chega à residência designada.",
                                     "A casa parece vazia... mas alguém esteve aqui recentemente.",
-                                    "Vou entrar e examinar o local."
-                                ], updateSceneActions, "MEE");
+                                ], updateSceneActions, "MEE SYSTEM");
                             });
                         }
                     }
-                ], "O AGENTE");
+                ], "MEE SYSTEM");
             });
         };
 
@@ -854,14 +854,74 @@ function toggleBlindfold() {
 let typingInterval = null;
 let finishTyping = null;
 
+const dialogueVoices = {
+    machine: "assets/sfx/voices/voice_maquina.mp3",
+    officer: "assets/sfx/voices/voice_officer.mp3",
+    system: "assets/sfx/voices/voice_system.mp3"
+};
+
+function stopTypingVoice() {
+    if (!typingVoice) return;
+
+    typingVoice.pause();
+    typingVoice.currentTime = 0;
+    typingVoice = null;
+}
+
+function startTypingVoice() {
+    stopTypingVoice();
+
+    const speaker = document
+        .getElementById("dialogue-speaker")
+        .textContent
+        .trim()
+        .toUpperCase();
+
+    let voicePath = null;
+
+    // MEE nunca possui voz
+    if (speaker === "MEE") {
+        return;
+    }
+
+    // Voz da máquina
+    if (activeVoiceOverride === "machine") {
+        voicePath = dialogueVoices.machine;
+    }
+    // Voz do agente
+    else if (["O AGENTE", "AGENTE", "??"].includes(speaker)) {
+        voicePath = dialogueVoices.officer;
+    }
+    // Voz do sistema
+    else if (speaker === "MEE SYSTEM" || speaker === "SISTEMA") {
+        voicePath = dialogueVoices.system;
+    }
+
+    if (!voicePath) return;
+
+    typingVoice = new Audio(voicePath);
+    typingVoice.loop = true;
+    typingVoice.volume = 0.4;
+
+    typingVoice.play().catch(error => {
+        console.warn("Erro ao reproduzir voz:", error);
+    });
+}
+
 function typeText(element, text, speed = 35) {
     return new Promise(resolve => {
         let index = 0;
 
+        if (typingInterval) {
+            clearInterval(typingInterval);
+            typingInterval = null;
+        }
+
+        stopTypingVoice();
+
         element.textContent = "";
         finishTyping = null;
 
-        // CORREÇÃO: Se o texto for vazio ou nulo, resolve imediatamente (evita o UNDEFINED)
         if (!text || text.trim() === "") {
             resolve();
             return;
@@ -873,6 +933,8 @@ function typeText(element, text, speed = 35) {
                 typingInterval = null;
             }
 
+            stopTypingVoice();
+
             element.textContent = text;
             finishTyping = null;
             resolve();
@@ -880,18 +942,22 @@ function typeText(element, text, speed = 35) {
 
         finishTyping = finish;
 
+        startTypingVoice();
+
         typingInterval = setInterval(() => {
-            // CORREÇÃO: Verifica se o caractere existe antes de adicionar
             if (text[index] !== undefined) {
                 element.textContent += text[index];
             }
-            
+
             index++;
 
             if (index >= text.length) {
                 clearInterval(typingInterval);
                 typingInterval = null;
+
+                stopTypingVoice();
                 finishTyping = null;
+
                 resolve();
             }
         }, speed);
