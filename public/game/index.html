@@ -80,6 +80,20 @@
         <div id="scene-actions"></div>
     </div>
 
+    <section id="safe-panel" class="hidden" aria-label="Cofre">
+        <div class="safe-card">
+            <p class="safe-kicker">COFRE OCULTO</p>
+            <h2>INSIRA A SENHA</h2>
+            <label for="safe-code">Código de cinco dígitos</label>
+            <input id="safe-code" inputmode="numeric" maxlength="5" autocomplete="off" aria-describedby="safe-feedback">
+            <p id="safe-feedback" class="safe-feedback" role="status"></p>
+            <div class="safe-actions">
+                <button id="safe-cancel" type="button">Voltar</button>
+                <button id="safe-submit" type="button">Confirmar</button>
+            </div>
+        </div>
+    </section>
+
     <section id="dialogue" class="hidden">
     <p id="dialogue-speaker" class="hidden"></p>
     <p id="dialogue-skip-hint">PRESSIONE ESPAÇO PARA PULAR</p>

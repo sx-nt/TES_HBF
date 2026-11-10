@@ -195,6 +195,64 @@ button:hover {
     color: #b83232;
 }
 
+/* COFRE */
+
+#safe-panel {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    display: grid;
+    place-items: center;
+    background: rgba(5, 7, 9, 0.72);
+    backdrop-filter: blur(2px);
+}
+
+.safe-card {
+    width: min(430px, calc(100% - 32px));
+    padding: 26px;
+    border: 1px solid #9b7777;
+    background: #111215;
+    box-shadow: 0 18px 60px rgba(0, 0, 0, 0.7);
+}
+
+.safe-kicker {
+    color: #bd9c9c;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    margin-bottom: 10px;
+}
+
+.safe-card h2 {
+    margin-bottom: 22px;
+    font-size: 18px;
+}
+
+.safe-card label {
+    display: block;
+    margin-bottom: 8px;
+    color: #aaa;
+    font-size: 11px;
+}
+
+#safe-code {
+    width: 100%;
+    border: 1px solid #777;
+    background: #08090b;
+    color: white;
+    padding: 12px;
+    font: inherit;
+    letter-spacing: 0.3em;
+}
+
+.safe-feedback {
+    min-height: 20px;
+    margin-top: 10px;
+    font-size: 11px;
+}
+
+.safe-feedback.error { color: #e18484; }
+.safe-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 12px; }
+
 /* DIÁLOGOS */
 
 #dialogue {

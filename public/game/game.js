@@ -70,6 +70,33 @@ const scenes = {
             unblindfolded: "assets/maps/S_Venda/ww_sem_venda.png"
         },
         hotspots: []
+    },
+
+    quadroZoom: {
+        hasHuman: false,
+        images: {
+            blindfolded: "assets/maps/S_Venda/zoom_quadro_com_venda.png",
+            unblindfolded: "assets/maps/S_Venda/zoom_quadro_sem_venda.png"
+        },
+        hotspots: []
+    },
+
+    cofre: {
+        hasHuman: false,
+        images: {
+            blindfolded: "assets/maps/S_Venda/zoom_cofre_sem_venda.png",
+            unblindfolded: "assets/maps/S_Venda/zoom_cofre_sem_venda.png"
+        },
+        hotspots: []
+    },
+
+    cofreAberto: {
+        hasHuman: false,
+        images: {
+            blindfolded: "assets/maps/S_Venda/zoom_cofre_aberto.png",
+            unblindfolded: "assets/maps/S_Venda/zoom_cofre_aberto.png"
+        },
+        hotspots: []
     }
 };
 
@@ -88,6 +115,9 @@ let hasHammer = false;
 let hasNails = false;
 let windowsExamined = false;
 let windowsCovered = false;
+let pictureExamined = false;
+let safeOpen = false;
+let bookCollected = false;
 let battery = 100;
 let isPaused = false;
 let bootInterval = null;
@@ -248,6 +278,9 @@ function startGame() {
     hasNails = false;
     windowsExamined = false;
     windowsCovered = false;
+    pictureExamined = false;
+    safeOpen = false;
+    bookCollected = false;
     battery = 100;
     isPaused = false;
     updateInventory();
@@ -366,12 +399,29 @@ function updateSceneActions() {
     }
 
     if (currentScene === "quarto") {
-        if (!windowsExamined) addAction("Examinar janela", examineWindow);
+        if (!windowsExamined) addAction("Examinar janelas", examineWindow);
+        addAction("Examinar quadro", examinePicture);
         addAction("Examinar espelho", () => loadScene("mirror"));
+        addAction("Examinar armário", () => showDialogue(["O armário está vazio. Só há poeira e marcas antigas na madeira."], updateSceneActions, "MEE"));
         if (windowsCovered && !blindfoldOn) {
             addAction("Ir para a construção", () => loadScene("construcao"));
         }
         addAction("Voltar aos portões", returnToGates);
+    }
+
+    if (currentScene === "quadroZoom") {
+        if (!pictureExamined) addAction("Remover o quadro", removePicture);
+        addAction("Voltar ao quarto", () => loadScene("quarto"));
+    }
+
+    if (currentScene === "cofre") {
+        addAction("Voltar", () => loadScene("quadroZoom"));
+        if (!safeOpen) addAction("Inserir senha", openSafePanel);
+    }
+
+    if (currentScene === "cofreAberto") {
+        if (!bookCollected) addAction("Pegar o livro", collectBook);
+        addAction("Voltar ao quarto", () => loadScene("quarto"));
     }
 
     if (currentScene === "ww") {
@@ -484,7 +534,13 @@ function startGatesSequence() {
                         label: "Seguir O Agente",
                         action: () => {
                             gatesReady = true;
-                            loadScene("houseFront");
+                            loadScene("houseFront", () => {
+                                showDialogue([
+                                    "MEE chega à residência designada.",
+                                    "A casa parece vazia... mas alguém esteve aqui recentemente.",
+                                    "Vou entrar e examinar o local."
+                                ], updateSceneActions, "MEE");
+                            });
                         }
                     }
                 ], "O AGENTE");
@@ -508,6 +564,63 @@ function examineTools() {
         "Você encontrou um martelo e alguns pregos.",
         "MEE SYSTEM: Ferramentas coletadas."
     ], updateSceneActions, "MEE");
+}
+
+function examinePicture() {
+    if (blindfoldOn) {
+        showDialogue(["Não consigo examinar o quadro enquanto estou vendado."], updateSceneActions, "MEE");
+        return;
+    }
+
+    loadScene("quadroZoom", () => {
+        showDialogue(["Parece que tem algo de estranho nesse quadro..."], updateSceneActions, "MEE");
+    });
+}
+
+function removePicture() {
+    pictureExamined = true;
+    loadScene("cofre", () => {
+        showDialogue(["O quadro escondia um cofre embutido na parede."], updateSceneActions, "MEE");
+    });
+}
+
+function openSafePanel() {
+    const panel = document.getElementById("safe-panel");
+    const input = document.getElementById("safe-code");
+    const feedback = document.getElementById("safe-feedback");
+    panel.classList.remove("hidden");
+    feedback.textContent = "";
+    input.value = "";
+    input.focus();
+}
+
+function closeSafePanel() {
+    document.getElementById("safe-panel").classList.add("hidden");
+}
+
+function submitSafeCode() {
+    const input = document.getElementById("safe-code");
+    const feedback = document.getElementById("safe-feedback");
+    if (input.value.trim() !== "03030") {
+        feedback.textContent = "SENHA INCORRETA";
+        feedback.className = "safe-feedback error";
+        return;
+    }
+
+    safeOpen = true;
+    closeSafePanel();
+    loadScene("cofreAberto", () => {
+        showDialogue(["Senha correta. O cofre foi aberto.", "Há um livro dentro. Vou guardá-lo."], updateSceneActions, "MEE");
+    });
+}
+
+function collectBook() {
+    if (bookCollected) return;
+    bookCollected = true;
+    inventory.push("livro");
+    updateInventory();
+    updateSceneActions();
+    showDialogue(["Livro adicionado ao inventário."], updateSceneActions, "MEE SYSTEM");
 }
 
 function examineWindow() {
@@ -875,6 +988,9 @@ function restartGame() {
     hasNails = false;
     windowsExamined = false;
     windowsCovered = false;
+    pictureExamined = false;
+    safeOpen = false;
+    bookCollected = false;
     battery = 100;
     isPaused = false;
     document.getElementById("top-hud").classList.add("hidden");
@@ -906,6 +1022,11 @@ document.getElementById("start-button").addEventListener("click", () => {
 });
 
 document.getElementById("restart-button").addEventListener("click", restartGame);
+document.getElementById("safe-cancel").addEventListener("click", closeSafePanel);
+document.getElementById("safe-submit").addEventListener("click", submitSafeCode);
+document.getElementById("safe-code").addEventListener("keydown", (event) => {
+    if (event.key === "Enter") submitSafeCode();
+});
 document.getElementById("blindfold-button").addEventListener("click", toggleBlindfold);
 document.getElementById("inventory-toggle").addEventListener("click", toggleInventory);
 document.getElementById("pause-button").addEventListener("click", togglePause);
