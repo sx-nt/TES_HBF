@@ -55,6 +55,7 @@
 
     <div id="top-hud" class="hidden" aria-label="Controles do jogo">
         <button id="inventory-toggle" type="button" aria-expanded="false">Inventário</button>
+        <button id="objectives-toggle" type="button" aria-expanded="false">Objetivos</button>
         <button id="pause-button" type="button" aria-expanded="false">Pausar</button>
         <div id="battery-meter" role="status" aria-label="Bateria do MEE">
             <span>BATERIA</span>
@@ -80,6 +81,23 @@
             <button id="pause-restart-button" type="button">Reiniciar</button>
         </div>
     </aside>
+
+    <!-- OBJETIVOS -->
+    <aside id="objectives" class="hidden" aria-label="Objetivos">
+        <div class="overlay-card">
+            <button id="objectives-close" class="overlay-close" type="button" aria-label="Fechar objetivos">×</button>
+            <span class="objectives-title">OBJETIVOS</span>
+            <p class="objectives-label">ATUAL</p>
+            <p id="objectives-current" class="objective-current" aria-live="polite">Nenhum objetivo no momento</p>
+            <p id="objectives-done-title" class="objectives-label hidden">CONCLUÍDOS</p>
+            <ul id="objectives-list" class="objectives-list hidden"></ul>
+        </div>
+    </aside>
+
+    <div id="objective-toast" class="hidden" role="status" aria-live="polite">
+        <span>NOVO OBJETIVO:</span>
+        <strong id="objective-toast-text"></strong>
+    </div>
 
     <div id="interface" class="hidden">
         <button id="blindfold-button">

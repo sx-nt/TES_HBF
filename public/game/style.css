@@ -941,3 +941,161 @@ button:hover {
         animation: none;
     }
 }
+
+/* ========================================
+   OBJETIVOS
+======================================== */
+
+#objectives {
+    position: absolute;
+    inset: 0;
+    z-index: 30;
+
+    display: grid;
+    place-items: center;
+
+    padding: 24px;
+    background: rgba(0, 0, 0, 0.72);
+    color: #d8d8d8;
+    font-size: 12px;
+
+    pointer-events: auto;
+}
+
+#objectives .overlay-card {
+    width: min(620px, 92vw);
+    max-height: min(760px, 88vh);
+    overflow: auto;
+    padding: 34px;
+
+    background: #2b2b2d;
+    border: 2px solid #17171a;
+    box-shadow:
+        0 0 0 10px #55565c,
+        0 18px 50px rgba(0, 0, 0, 0.7);
+}
+
+#objectives .objectives-title {
+    display: block;
+    color: #bd9c9c;
+    margin-bottom: 20px;
+}
+
+#objectives .overlay-close {
+    color: #f1f1f1;
+    background: #19191c;
+    border: 2px solid #55565c;
+}
+
+#objectives .overlay-close:focus-visible {
+    outline: 3px solid #d3b37a;
+    outline-offset: 3px;
+}
+
+.objectives-label {
+    margin: 16px 0 8px;
+    color: #8f8f96;
+    font-size: 10px;
+}
+
+.objective-current {
+    padding: 14px 12px;
+
+    border: 2px solid #17171a;
+    background: #39393f;
+    box-shadow: inset 0 0 0 2px #d3b37a;
+
+    color: #f1e3c4;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.objective-current::before {
+    content: "> ";
+    color: #d3b37a;
+}
+
+.objectives-list {
+    display: grid;
+    gap: 6px;
+    list-style: none;
+}
+
+.objective-done {
+    padding: 8px 12px;
+
+    border: 2px solid #17171a;
+    background: #313136;
+
+    color: #77777e;
+    text-decoration: line-through;
+    line-height: 1.4;
+}
+
+#objective-toast {
+    position: absolute;
+    top: 64px;
+    left: 50%;
+    z-index: 35;
+    transform: translateX(-50%);
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: min(560px, 90vw);
+    padding: 10px 16px;
+
+    background: rgba(16, 16, 16, 0.94);
+    border: 1px solid #d3b37a;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+
+    color: #f1e3c4;
+    font-size: 11px;
+
+    pointer-events: none;
+}
+
+#objective-toast span {
+    color: #d3b37a;
+    white-space: nowrap;
+}
+
+#objective-toast.objective-toast-show {
+    animation: objective-toast-in 3.5s ease forwards;
+}
+
+@keyframes objective-toast-in {
+    0% { opacity: 0; transform: translate(-50%, -10px); }
+    10% { opacity: 1; transform: translate(-50%, 0); }
+    85% { opacity: 1; transform: translate(-50%, 0); }
+    100% { opacity: 0; transform: translate(-50%, -6px); }
+}
+
+#objectives-toggle.objective-pulse {
+    animation: objective-pulse 0.9s ease-in-out 4;
+}
+
+@keyframes objective-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(211, 179, 122, 0); border-color: #aaa; }
+    50% { box-shadow: 0 0 0 4px rgba(211, 179, 122, 0.55); border-color: #d3b37a; }
+}
+
+@media (max-width: 640px) {
+    #objective-toast {
+        top: 54px;
+        font-size: 9px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    #objectives .overlay-card {
+        padding: 28px 18px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #objective-toast.objective-toast-show,
+    #objectives-toggle.objective-pulse {
+        animation: none;
+    }
+}
