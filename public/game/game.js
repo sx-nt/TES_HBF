@@ -126,6 +126,7 @@ let passwordFound = false;
 let machineExamined = false;
 let machineZoomActive = false;
 let battery = 100;
+let objectives = [];
 let isPaused = false;
 let bootInterval = null;
 let typingVoice = null;
@@ -299,6 +300,7 @@ function startGame() {
 machineExamined = false;
   machineZoomActive = false;
   battery = 100;
+    resetObjectives();
     isPaused = false;
     updateInventory();
     updateBattery();
@@ -572,7 +574,8 @@ function saveGame() {
         blindfoldOn, hasBlindfold, computerExamined, debrisExamined, inventory,
         gatesReady, toolsExamined, hasHammer, hasNails, windowsExamined, windowsCovered,
         pictureExamined, safeOpen, bookCollected, keyCollected, cabinetUnlocked,
-        passwordFound, machineExamined, machineZoomActive, battery, currentScene
+        passwordFound, machineExamined, machineZoomActive, battery, currentScene,
+        objectives
     };
     localStorage.setItem("mee-save", JSON.stringify(saveState));
     document.getElementById("save-feedback").textContent = "Jogo salvo neste navegador.";
@@ -609,7 +612,7 @@ async function examineDebris() {
         debrisExamined = true;
         machineZoomActive = false;
 
-        loadScene("beach", updateSceneActions);
+        loadScene("beach", withObjective("venda", "Colete madeira e coloque a venda", updateSceneActions));
     });
 }
 
@@ -657,6 +660,7 @@ function startGatesSequence() {
 
             // Executa todas as etapas do diálogo do agente
             playDialogueSteps(officer.steps).then(() => {
+                setObjective("seguir-agente", "Siga o Agente até a casa");
                 showChoiceDialogue("O Agente espera você. Seguir agora?", [
                     {
                         label: "Seguir O Agente",
@@ -665,7 +669,7 @@ function startGatesSequence() {
                             loadScene("houseFront", () => {
                                 showDialogue([
                                     "A casa parece vazia... mas alguém esteve aqui recentemente.",
-                                ], updateSceneActions, "MEE SYSTEM");
+                                ], withObjective("explorar-casa", "Explore a casa", updateSceneActions), "MEE SYSTEM");
                             });
                         }
                     }
@@ -767,7 +771,7 @@ function examinePicture() {
 function removePicture() {
     pictureExamined = true;
     loadScene("cofre", () => {
-        showDialogue(["O quadro escondia um cofre embutido na parede."], updateSceneActions, "MEE SYSTEM");
+        showDialogue(["O quadro escondia um cofre embutido na parede."], withObjective("senha-cofre", "Descubra a senha do cofre", updateSceneActions), "MEE SYSTEM");
     });
 }
 
@@ -807,7 +811,7 @@ function collectBook() {
     inventory.push("livro");
     updateInventory();
     updateSceneActions();
-    showDialogue(["Livro adicionado ao inventário."], updateSceneActions, "MEE SYSTEM");
+    showDialogue(["Livro adicionado ao inventário."], withObjective("ler-livro", "Leia o livro", updateSceneActions), "MEE SYSTEM");
 }
 
 function examineWindow() {
@@ -817,7 +821,7 @@ function examineWindow() {
             "Parece que estou sendo vigiado...",
             "Preciso fazer algo para que possa tirar a venda sem ser pego.",
             "Talvez algum item que coletei possa ser útil."
-        ], updateSceneActions, "MEE");
+        ], withObjective("tapar-janelas", "Encontre uma forma de tapar as janelas", updateSceneActions), "MEE");
     });
 }
 
@@ -836,7 +840,7 @@ function coverWindows() {
     loadScene("quarto", () => {
         showDialogue(
             ["Ótimo. Agora que as janelas estão cobertas posso retirar a venda."],
-            updateSceneActions,
+            withObjective("investigar-quarto", "Investigue o quarto sem a venda", updateSceneActions),
             "MEE"
         );
     });
@@ -858,6 +862,98 @@ function returnToGates() {
             ], "O AGENTE");
         }, officer.speaker);
     });
+}
+
+// OBJETIVOS
+
+let objectiveToastTimer = null;
+
+// Objetivo inicial (definido sem notificação ao iniciar/reiniciar)
+function resetObjectives() {
+    objectives = [{ id: "destrocos", text: "Examine os destroços na praia", done: false }];
+    clearTimeout(objectiveToastTimer);
+    document.getElementById("objective-toast")?.classList.add("hidden");
+    document.getElementById("objectives-toggle")?.classList.remove("objective-pulse");
+    updateObjectives();
+}
+
+// Define um novo objetivo atual; os objetivos anteriores são concluídos.
+// Um objetivo já dado (atual ou concluído) não é repetido nem reaberto.
+function setObjective(id, text) {
+    if (objectives.some(objective => objective.id === id)) return;
+
+    objectives.forEach(objective => {
+        objective.done = true;
+    });
+    objectives.push({ id, text, done: false });
+
+    updateObjectives();
+    showObjectiveToast(text);
+}
+
+function completeObjective(id) {
+    const objective = objectives.find(item => item.id === id);
+    if (!objective || objective.done) return;
+    objective.done = true;
+    updateObjectives();
+}
+
+// Retorna um callback que define o objetivo e depois segue o fluxo normal
+function withObjective(id, text, next = null) {
+    return () => {
+        setObjective(id, text);
+        if (next) next();
+    };
+}
+
+function updateObjectives() {
+    const currentEl = document.getElementById("objectives-current");
+    const listEl = document.getElementById("objectives-list");
+    if (!currentEl || !listEl) return;
+
+    const current = [...objectives].reverse().find(objective => !objective.done);
+    currentEl.textContent = current ? current.text : "Nenhum objetivo no momento";
+
+    listEl.replaceChildren();
+    objectives.filter(objective => objective.done).forEach(objective => {
+        const item = document.createElement("li");
+        item.className = "objective-done";
+        item.textContent = objective.text;
+        listEl.appendChild(item);
+    });
+
+    listEl.classList.toggle("hidden", !listEl.children.length);
+    document.getElementById("objectives-done-title")?.classList.toggle("hidden", !listEl.children.length);
+}
+
+function showObjectiveToast(text) {
+    const toast = document.getElementById("objective-toast");
+    const button = document.getElementById("objectives-toggle");
+    if (!toast) return;
+
+    document.getElementById("objective-toast-text").textContent = text;
+    toast.classList.remove("hidden", "objective-toast-show");
+    void toast.offsetWidth;
+    toast.classList.add("objective-toast-show");
+
+    if (button) {
+        button.classList.remove("objective-pulse");
+        void button.offsetWidth;
+        button.classList.add("objective-pulse");
+    }
+
+    clearTimeout(objectiveToastTimer);
+    objectiveToastTimer = setTimeout(() => toast.classList.add("hidden"), 3500);
+}
+
+function toggleObjectives() {
+    const panel = document.getElementById("objectives");
+    const button = document.getElementById("objectives-toggle");
+    const isOpen = !panel.classList.contains("hidden");
+
+    panel.classList.toggle("hidden", isOpen);
+    button.setAttribute("aria-expanded", String(!isOpen));
+    button.classList.remove("objective-pulse");
 }
 
 // MECÂNICA DA VENDA
@@ -1202,7 +1298,7 @@ function activateBlindfold() {
                     "Quando equipada, as aparências já não são mais as mesmas...",
                     "Quando removida, segredos são revelados ...",
                     "CUIDADO: Nunca remova a venda perto de humanos!",
-                ], null, "MEE SYSTEM");
+                ], withObjective("portoes", "Vá até os portões"), "MEE SYSTEM");
             },
             "MEE" // <-- O speaker "MEE" ativa a cor diferenciada no CSS
         );
@@ -1254,6 +1350,7 @@ function restartGame() {
 machineExamined = false;
   machineZoomActive = false;
   battery = 100;
+    resetObjectives();
     isPaused = false;
     document.getElementById("top-hud").classList.add("hidden");
     document.getElementById("pause-menu").classList.add("hidden");
@@ -1295,6 +1392,8 @@ document.getElementById("safe-code").addEventListener("keydown", (event) => {
 document.getElementById("blindfold-button").addEventListener("click", toggleBlindfold);
 document.getElementById("inventory-toggle").addEventListener("click", toggleInventory);
 document.getElementById("inventory-close").addEventListener("click", toggleInventory);
+document.getElementById("objectives-toggle").addEventListener("click", toggleObjectives);
+document.getElementById("objectives-close").addEventListener("click", toggleObjectives);
 document.getElementById("save-button").addEventListener("click", saveGame);
 updateBlindfoldButton();
 document.getElementById("pause-button").addEventListener("click", togglePause);
