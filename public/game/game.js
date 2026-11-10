@@ -845,9 +845,12 @@ function stopTypingVoice() {
 function startTypingVoice() {
     stopTypingVoice();
 
-    const speaker = document.getElementById("dialogue-speaker")?.textContent?.trim().toUpperCase();
-    const voicePath = dialogueVoiceBySpeaker[speaker] || dialogueVoiceBySpeaker["MEE SYSTEM"];
-    typingVoice = new Audio(voicePath);
+  const speaker = document.getElementById("dialogue-speaker")?.textContent?.trim().toUpperCase();
+  const isDestroyedMachineDialogue = currentScene === "construcao" && machineZoomActive;
+  const voicePath = isDestroyedMachineDialogue
+    ? dialogueVoiceBySpeaker["MAQUINA"]
+    : dialogueVoiceBySpeaker[speaker] || dialogueVoiceBySpeaker["MEE SYSTEM"];
+  typingVoice = new Audio(voicePath);
     typingVoice.loop = true;
     typingVoice.volume = 0.35;
     typingVoice.play().catch(() => {});
