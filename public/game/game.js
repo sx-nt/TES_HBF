@@ -418,10 +418,10 @@ function updateSceneActions() {
     }
 
     if (currentScene === "quarto") {
-        addAction("Examinar janelas", examineWindow);
-        addAction("Examinar quadro", examinePicture);
+    if (!windowsCovered) addAction("Examinar janelas", examineWindow);
+    addAction("Examinar quadro", examinePicture);
         addAction("Examinar espelho", () => loadScene("mirror"));
-        addAction(cabinetUnlocked ? "Examinar gaveta" : "Destrancar armário", examineCabinet);
+        addAction("Examinar armário", examineCabinet);
         if (windowsCovered && !blindfoldOn && toolsExamined && hasHammer && hasNails) {
             addAction("Ir para a construção", () => loadScene("construcao"));
         }
@@ -626,15 +626,15 @@ function examineCabinet() {
             return;
         }
         cabinetUnlocked = true;
-        showDialogue(["A chave do espelho destrancou o armário.", "Há uma gaveta com algo escrito dentro."], updateSceneActions, "MEE");
-        return;
     }
 
     if (!passwordFound) {
         passwordFound = true;
         inventory.push("senha do cofre");
         updateInventory();
-        showDialogue(["A senha foi encontrada na gaveta e adicionada ao inventário."], updateSceneActions, "MEE SYSTEM");
+        showDialogue(["A gaveta está aberta. A senha do cofre foi adicionada ao inventário."], updateSceneActions, "MEE SYSTEM");
+    } else {
+        showDialogue(["O armário está destrancado. A gaveta já foi examinada."], updateSceneActions, "MEE");
     }
 }
 
