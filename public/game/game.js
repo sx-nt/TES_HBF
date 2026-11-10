@@ -118,6 +118,10 @@ let windowsCovered = false;
 let pictureExamined = false;
 let safeOpen = false;
 let bookCollected = false;
+let keyCollected = false;
+let cabinetUnlocked = false;
+let passwordFound = false;
+let machineExamined = false;
 let battery = 100;
 let isPaused = false;
 let bootInterval = null;
@@ -281,6 +285,10 @@ function startGame() {
     pictureExamined = false;
     safeOpen = false;
     bookCollected = false;
+    keyCollected = false;
+    cabinetUnlocked = false;
+    passwordFound = false;
+    machineExamined = false;
     battery = 100;
     isPaused = false;
     updateInventory();
@@ -295,9 +303,17 @@ function startGame() {
 function loadScene(sceneName, onLoaded = null) {
     const scene = scenes[sceneName];
 
-    const imagePath = blindfoldOn
+    let imagePath = blindfoldOn
         ? scene.images.blindfolded
         : scene.images.unblindfolded;
+
+    if (sceneName === "quarto" && !blindfoldOn && pictureExamined) {
+        imagePath = "assets/maps/S_Venda/quarto_sem_venda_cofre.png";
+    }
+
+    if (sceneName === "construcao" && !blindfoldOn && machineExamined) {
+        imagePath = "assets/maps/S_Venda/maquina_zoom_sem_venda.png";
+    }
 
     document.getElementById("scene-actions").innerHTML = "";
 
@@ -389,12 +405,8 @@ function updateSceneActions() {
     }
 
     if (currentScene === "houseFront") {
-        if (!toolsExamined) {
-            addAction("Examinar ferramentas", examineTools);
-        } else if (!hasHammer || !hasNails) {
-            addAction("Examinar ferramentas novamente", examineTools);
-        }
-
+        if (!toolsExamined) addAction("Examinar ferramentas", examineTools);
+        if (toolsExamined && (!hasHammer || !hasNails)) addAction("Coletar ferramentas", collectTools);
         addAction("Entrar na casa", () => loadScene("quarto"));
     }
 
@@ -402,8 +414,8 @@ function updateSceneActions() {
         if (!windowsExamined) addAction("Examinar janelas", examineWindow);
         addAction("Examinar quadro", examinePicture);
         addAction("Examinar espelho", () => loadScene("mirror"));
-        addAction("Examinar armário", () => showDialogue(["O armário está vazio. Só há poeira e marcas antigas na madeira."], updateSceneActions, "MEE"));
-        if (windowsCovered && !blindfoldOn) {
+        addAction(cabinetUnlocked ? "Examinar gaveta" : "Destrancar armário", examineCabinet);
+        if (windowsCovered && !blindfoldOn && toolsExamined && hasHammer && hasNails) {
             addAction("Ir para a construção", () => loadScene("construcao"));
         }
         addAction("Voltar aos portões", returnToGates);
@@ -416,12 +428,18 @@ function updateSceneActions() {
 
     if (currentScene === "cofre") {
         addAction("Voltar", () => loadScene("quadroZoom"));
-        if (!safeOpen) addAction("Inserir senha", openSafePanel);
+        if (!safeOpen) {
+            if (passwordFound) addAction("Inserir senha", openSafePanel);
+            else addAction("Encontrar a senha na gaveta", () => showDialogue(["O cofre não pode ser aberto sem a senha. Ela deve estar na gaveta do armário."], updateSceneActions, "MEE SYSTEM"));
+        }
     }
 
     if (currentScene === "cofreAberto") {
-        if (!bookCollected) addAction("Pegar o livro", collectBook);
-        addAction("Voltar ao quarto", () => loadScene("quarto"));
+        if (!bookCollected) {
+            addAction("Pegar o livro", collectBook);
+        } else {
+            addAction("Voltar ao quarto", () => loadScene("quarto"));
+        }
     }
 
     if (currentScene === "ww") {
@@ -430,10 +448,16 @@ function updateSceneActions() {
     }
 
     if (currentScene === "mirror") {
-        addAction("Voltar ao quarto", () => loadScene("quarto"));
+        if (!keyCollected) {
+            addAction("Coletar chave", collectKey);
+        } else {
+            addAction("Voltar ao quarto", () => loadScene("quarto"));
+        }
     }
 
     if (currentScene === "construcao") {
+        if (!machineExamined) addAction("Examinar máquina destruída", examineMachine);
+        else addAction("Interagir com a máquina", examineMachine);
         addAction("Voltar ao quarto", () => loadScene("quarto"));
     }
 }
@@ -454,7 +478,7 @@ function updateInventory() {
     const itemsEl = document.getElementById("inventory-items");
     if (!inventoryEl || !itemsEl) return;
     itemsEl.textContent = inventory.length
-        ? inventory.map(item => item === "madeira" ? "MADEIRA" : item.toUpperCase()).join(" • ")
+        ? inventory.map(item => item.toUpperCase()).join(" • ")
         : "Vazio";
 }
 
@@ -557,13 +581,65 @@ function startGatesSequence() {
 }
 
 function examineTools() {
+    if (toolsExamined) return;
     toolsExamined = true;
+    showDialogue([
+        "Há um martelo e alguns pregos entre as ferramentas.",
+        "Preciso coletar tudo antes de deixar esta ação concluída."
+    ], updateSceneActions, "MEE");
+}
+
+function collectTools() {
+    if (!toolsExamined || (hasHammer && hasNails)) return;
     hasHammer = true;
     hasNails = true;
-    showDialogue([
-        "Você encontrou um martelo e alguns pregos.",
-        "MEE SYSTEM: Ferramentas coletadas."
-    ], updateSceneActions, "MEE");
+    inventory.push("martelo", "pregos");
+    updateInventory();
+    showDialogue(["Martelo e pregos adicionados ao inventário."], updateSceneActions, "MEE SYSTEM");
+}
+
+function collectKey() {
+    if (blindfoldOn || keyCollected) {
+        if (blindfoldOn) showDialogue(["Não consigo encontrar a chave enquanto estou vendado."], updateSceneActions, "MEE");
+        return;
+    }
+    keyCollected = true;
+    inventory.push("chave do armário");
+    updateInventory();
+    showDialogue(["A chave encontrada no espelho foi adicionada ao inventário."], updateSceneActions, "MEE SYSTEM");
+}
+
+function examineCabinet() {
+    if (blindfoldOn) {
+        showDialogue(["Não consigo examinar o armário enquanto estou vendado."], updateSceneActions, "MEE");
+        return;
+    }
+
+    if (!cabinetUnlocked) {
+        if (!keyCollected) {
+            showDialogue(["O armário está trancado. Preciso encontrar uma chave."], updateSceneActions, "MEE");
+            return;
+        }
+        cabinetUnlocked = true;
+        showDialogue(["A chave do espelho destrancou o armário.", "Há uma gaveta com algo escrito dentro."], updateSceneActions, "MEE");
+        return;
+    }
+
+    if (!passwordFound) {
+        passwordFound = true;
+        inventory.push("senha do cofre");
+        updateInventory();
+        showDialogue(["A senha foi encontrada na gaveta e adicionada ao inventário."], updateSceneActions, "MEE SYSTEM");
+    }
+}
+
+function examineMachine() {
+    if (!machineExamined) {
+        machineExamined = true;
+        loadScene("construcao", () => showDialogue(["A máquina destruída ainda guarda sinais de energia."], updateSceneActions, "MEE"));
+        return;
+    }
+    showDialogue(["Não há mais nada que eu possa retirar da máquina."], updateSceneActions, "MEE");
 }
 
 function examinePicture() {
@@ -636,6 +712,10 @@ function examineWindow() {
 }
 
 function coverWindows() {
+    if (!toolsExamined || !hasHammer || !hasNails) {
+        showDialogue(["Ainda não posso tapar as janelas: preciso coletar o martelo e os pregos."], updateSceneActions, "MEE SYSTEM");
+        return;
+    }
     windowsCovered = true;
 
     loadScene("quarto", () => {
@@ -991,6 +1071,10 @@ function restartGame() {
     pictureExamined = false;
     safeOpen = false;
     bookCollected = false;
+    keyCollected = false;
+    cabinetUnlocked = false;
+    passwordFound = false;
+    machineExamined = false;
     battery = 100;
     isPaused = false;
     document.getElementById("top-hud").classList.add("hidden");
