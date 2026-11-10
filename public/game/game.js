@@ -1,4 +1,12 @@
 import { getDialogue } from "./data/dialogues.js";
+import {
+    playBootSound,
+    stopBootSound,
+    playTransitionSound,
+    setupUiSounds,
+    playBackgroundMusic,
+    pauseBackgroundMusic
+} from "./core/audio.js";
 
 const scenes = {
     beach: {
@@ -93,6 +101,7 @@ const scenes = {
 };
 
 
+
 // ESTADO DO JOGO
 
 let currentScene = null;
@@ -161,6 +170,7 @@ function crtTransition(callback) {
     transition.classList.remove("cover", "reveal");
     void transition.offsetWidth;
 
+    playTransitionSound();
     transition.classList.add("cover");
 
     setTimeout(() => {
@@ -207,6 +217,7 @@ async function startBoot() {
     counter.classList.add("hidden");
 
     skipBoot = false;
+    playBootSound();
 
     for (const message of bootMessages) {
         if (skipBoot) {
@@ -261,6 +272,8 @@ async function startBoot() {
 // INICIAR JOGO
 
 function startGame() {
+    stopBootSound();
+    playBackgroundMusic();
     document.getElementById("boot-screen").classList.add("hidden");
     document.getElementById("scene").classList.add("hidden");
     document.getElementById("interface").classList.add("hidden");
@@ -555,6 +568,12 @@ function togglePause() {
     document.getElementById("pause-menu").classList.toggle("hidden", !isPaused);
     document.getElementById("pause-button").setAttribute("aria-expanded", String(isPaused));
     document.getElementById("game").classList.toggle("paused", isPaused);
+
+    if(isPaused){
+        pauseBackgroundMusic();
+    }else{
+        playBackgroundMusic();
+    }
 }
 
 async function examineDebris() {
@@ -652,9 +671,8 @@ function examineTools() {
     if (toolsExamined) return;
     toolsExamined = true;
     showDialogue([
-        "Há um martelo e alguns pregos entre as ferramentas.",
-        "Preciso coletar tudo antes de deixar esta ação concluída."
-    ], updateSceneActions, "MEE");
+        "Há um martelo e alguns pregos entre as ferramentas."
+    ], updateSceneActions, "MEE SYSTEM");
 }
 
 function collectTools() {
@@ -663,12 +681,12 @@ function collectTools() {
     hasNails = true;
     inventory.push("martelo");
     updateInventory();
-    showDialogue(["Martelo e pregos adicionados ao inventário."], updateSceneActions, "MEE SYSTEM");
+    showDialogue(["Ferramentas adicionadas ao inventário."], updateSceneActions, "MEE SYSTEM");
 }
 
 function collectKey() {
     if (blindfoldOn || keyCollected) {
-        if (blindfoldOn) showDialogue(["Não consigo encontrar a chave enquanto estou vendado."], updateSceneActions, "MEE");
+        if (blindfoldOn) showDialogue(["Esse... Sou eu ?"], updateSceneActions, "MEE");
         return;
     }
   keyCollected = true;
@@ -676,12 +694,12 @@ function collectKey() {
   if (mirrorKeyOverlay) mirrorKeyOverlay.classList.add("hidden");
   inventory.push("chave do armário");
     updateInventory();
-    showDialogue(["A chave encontrada no espelho foi adicionada ao inventário."], updateSceneActions, "MEE SYSTEM");
+    showDialogue(["A chave foi adicionada ao inventário."], updateSceneActions, "MEE SYSTEM");
 }
 
 function examineCabinet() {
     if (blindfoldOn) {
-        showDialogue(["Não consigo examinar o armário enquanto estou vendado."], updateSceneActions, "MEE");
+        showDialogue(["Hmmm Parece que está trancado."], updateSceneActions, "MEE SYSTEM");
         return;
     }
 
@@ -697,9 +715,9 @@ function examineCabinet() {
         passwordFound = true;
         inventory.push("senha do cofre");
         updateInventory();
-        showDialogue(["A gaveta está aberta. A senha do cofre foi adicionada ao inventário."], updateSceneActions, "MEE SYSTEM");
+        showDialogue(["A gaveta foi aberta. Parece que há um documento ai dentro"], updateSceneActions, "MEE SYSTEM");
     } else {
-        showDialogue(["O armário está destrancado. A gaveta já foi examinada."], updateSceneActions, "MEE");
+        showDialogue(["Parece que já examinei essa gaveta"], updateSceneActions, "MEE");
     }
 }
 
@@ -722,7 +740,7 @@ function examineMachine() {
 
 function examinePicture() {
     if (blindfoldOn) {
-        showDialogue(["Não consigo examinar o quadro enquanto estou vendado."], updateSceneActions, "MEE");
+        showDialogue(["Me parece normal."], updateSceneActions, "MEE");
         return;
     }
 
@@ -734,7 +752,7 @@ function examinePicture() {
 function removePicture() {
     pictureExamined = true;
     loadScene("cofre", () => {
-        showDialogue(["O quadro escondia um cofre embutido na parede."], updateSceneActions, "MEE");
+        showDialogue(["O quadro escondia um cofre embutido na parede."], updateSceneActions, "MEE SYSTEM");
     });
 }
 
@@ -764,7 +782,7 @@ function submitSafeCode() {
     safeOpen = true;
     closeSafePanel();
     loadScene("cofreAberto", () => {
-        showDialogue(["Senha correta. O cofre foi aberto.", "Há um livro dentro. Vou guardá-lo."], updateSceneActions, "MEE");
+        showDialogue(["Senha Correta. Me parece que há um livro ai dentro"], updateSceneActions, "MEE SYSTEM");
     });
 }
 
@@ -783,14 +801,14 @@ function examineWindow() {
         showDialogue([
             "Parece que estou sendo vigiado...",
             "Preciso fazer algo para que possa tirar a venda sem ser pego.",
-            "Talvez a madeira e as ferramentas possam ser úteis."
+            "Talvez algum item que coletei possa ser útil."
         ], updateSceneActions, "MEE");
     });
 }
 
 function coverWindows() {
     if (!toolsExamined || !hasHammer || !hasNails) {
-        showDialogue(["Ainda não posso tapar as janelas: preciso coletar o martelo e os pregos."], updateSceneActions, "MEE SYSTEM");
+        showDialogue(["Ainda não tenho como tapar as janelas, talvez deva procurar uma ferramenta que possa me ajudar"], updateSceneActions, "MEE");
         return;
     }
     windowsCovered = true;
@@ -801,7 +819,7 @@ function coverWindows() {
         }
 
         showDialogue([
-            "Ótimo. Agora que as janelas estão cobertas, posso retirar a venda sem correr o risco de ser visto."
+            "Ótimo. Agora que as janelas estão cobertas posso retirar a venda."
         ], null, "MEE");
 
         updateSceneActions();
@@ -1135,16 +1153,6 @@ async function playDialogueSteps(steps) {
     }
 }
 
-function examineComputer() {
-    if (computerExamined) {
-        const dialogue = getDialogue("computerAlreadyExamined");
-        showDialogue(dialogue.lines, null, dialogue.speaker);
-        return;
-    }
-
-    computerExamined = true;
-    playDialogueSteps(getDialogue("computerIntro").steps);
-}
 
 // RECEBER A VENDA
 // RECEBER A VENDA
@@ -1175,7 +1183,7 @@ function activateBlindfold() {
                     "Venda equipada.",
                     "Use o botão no canto superior esquerdo para colocar ou retirar a venda.",
                     "Quando equipada, as aparências já não são mais as mesmas...",
-                    "Quando removida, seus segredos não podem mais ser mantidos ...",
+                    "Quando removida, segredos são revelados ...",
                     "CUIDADO: Nunca remova a venda perto de humanos!",
                 ], null, "MEE SYSTEM");
             },
@@ -1253,6 +1261,8 @@ window.startBoot = startBoot;
 window.startGame = startGame;
 
 // EVENTOS
+setupUiSounds();
+
 document.getElementById("start-button").addEventListener("click", () => {
     crtTransition(() => {
         startBoot();
