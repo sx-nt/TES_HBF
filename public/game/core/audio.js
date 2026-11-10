@@ -72,6 +72,16 @@ export function playUiSound(name) {
     }
 }
 
+const POPUP_TOGGLES = {
+    "inventory-toggle": "inventory",
+    "objectives-toggle": "objectives",
+    "pause-button": "pause-menu"
+};
+
+const POPUP_CLOSE_BUTTONS = [
+    "inventory-close", "objectives-close", "safe-cancel", "document-close", "book-close"
+];
+
 export function setupUiSounds() {
     document.addEventListener("click", event => {
         const button = event.target.closest("button");
@@ -88,10 +98,10 @@ export function setupUiSounds() {
         ) return;
 
 
-        if (id === "inventory-toggle" || id === "pause-button") {
-            const panel = id === "inventory-toggle"
-                ? document.getElementById("inventory")
-                : document.getElementById("pause-menu");
+        // Lê o estado do painel antes do clique alterá-lo (fase de captura)
+        const panelId = POPUP_TOGGLES[id];
+        if (panelId) {
+            const panel = document.getElementById(panelId);
 
             playUiSound(
                 panel.classList.contains("hidden")
@@ -101,7 +111,7 @@ export function setupUiSounds() {
             return;
         }
 
-        if (id === "inventory-close" || id === "safe-cancel") {
+        if (POPUP_CLOSE_BUTTONS.includes(id)) {
             playUiSound("popupClose");
             return;
         }
@@ -116,5 +126,5 @@ export function setupUiSounds() {
         }
 
         playUiSound("select");
-    });
+    }, true);
 }

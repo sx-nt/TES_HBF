@@ -1,0 +1,173 @@
+/* ========================================
+   INTERFACE DO CENÁRIO
+======================================== */
+
+#interface {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+#interface button {
+    pointer-events: auto;
+}
+
+/* Ações bloqueadas enquanto um cenário carrega */
+#game.scene-loading #interface button {
+    pointer-events: none;
+}
+
+#scene-actions {
+    position: absolute;
+    bottom: 25px;
+    left: 25px;
+
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+
+    transition: opacity 0.2s ease;
+}
+
+#blindfold-button {
+    position: absolute;
+    top: 68px;
+    left: 24px;
+    z-index: 13;
+
+    display: block;
+    padding: 7px 12px;
+    font-size: 11px;
+}
+
+/* ========================================
+   BARRA SUPERIOR
+======================================== */
+
+#top-hud {
+    position: absolute;
+    top: 18px;
+    left: 18px;
+    right: 18px;
+    z-index: 12;
+
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    pointer-events: none;
+}
+
+#top-hud > * {
+    pointer-events: auto;
+}
+
+#top-hud button {
+    padding: 8px 12px;
+    font-size: 11px;
+}
+
+#battery-meter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+    padding: 7px 10px;
+
+    background: var(--color-hud-bg);
+    border: 1px solid var(--color-border);
+    font-size: 10px;
+}
+
+.battery-track {
+    width: 92px;
+    height: 9px;
+    border: 1px solid var(--color-button-border);
+    background: var(--color-battery-track);
+}
+
+#battery-level {
+    width: 100%;
+    height: 100%;
+    background: var(--color-accent);
+    transition: width 0.25s ease, background 0.25s ease;
+}
+
+#battery-level.battery-low {
+    background: var(--color-danger);
+}
+
+/* ========================================
+   PAUSA
+======================================== */
+
+#pause-menu {
+    position: absolute;
+    inset: 0;
+    z-index: 40;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 12px;
+
+    padding: 24px;
+    background: var(--color-backdrop-strong);
+    pointer-events: auto;
+}
+
+.pause-card {
+    display: grid;
+    gap: 12px;
+    text-align: center;
+}
+
+#pause-menu h2 {
+    color: var(--color-accent);
+    font-size: 20px;
+    margin-bottom: 8px;
+}
+
+#save-feedback {
+    min-height: 1em;
+    color: var(--color-accent);
+}
+
+#game.paused #scene,
+#game.paused #interface,
+#game.paused #dialogue {
+    filter: brightness(0.35);
+}
+
+/* ========================================
+   RESPONSIVIDADE
+======================================== */
+
+@media (max-width: 640px) {
+    #top-hud {
+        top: 10px;
+        left: 10px;
+        right: 10px;
+    }
+
+    #top-hud button {
+        padding: 7px 8px;
+        font-size: 9px;
+    }
+
+    .battery-track {
+        width: 58px;
+    }
+
+    #battery-meter span {
+        display: none;
+    }
+
+    #blindfold-button {
+        top: 62px;
+        left: 10px;
+        padding: 6px 9px;
+        font-size: 10px;
+    }
+}

@@ -5,7 +5,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Humanity's Best Friend</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/screens.css">
+    <link rel="stylesheet" href="css/scene.css">
+    <link rel="stylesheet" href="css/hud.css">
+    <link rel="stylesheet" href="css/dialogue.css">
+    <link rel="stylesheet" href="css/inventory.css">
+    <link rel="stylesheet" href="css/objectives.css">
+    <link rel="stylesheet" href="css/readers.css">
+    <link rel="stylesheet" href="css/safe.css">
+    <link rel="stylesheet" href="css/effects.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
@@ -22,7 +31,7 @@
     <div class="start-content">
         <h1>HUMANITY'S BEST FRIEND</h1>
         <p id="subtitulo">Capítulo 1: O Despertar</p>
-        <button id="start-button" type="button" onclick="window.startBoot?.()">START</button>
+        <button id="start-button" type="button">START</button>
     </div>
 
     <div class="start-copyright">©2026 SXNT</div>
@@ -43,14 +52,13 @@
                 </div>
             </div>
         </div>
-        <p id="dialogue-skip-hint">PRESSIONE ESPAÇO PARA PULAR</p>
+        <p id="boot-skip-hint" class="skip-hint">PRESSIONE ESPAÇO PARA PULAR</p>
     </section>
 
     <!-- CENÁRIO -->
     <div id="scene" class="hidden">
         <img id="background" src="" alt="Cenário">
         <img id="mirror-key-overlay" class="hidden" src="assets/items/chave.png" alt="Chave sobre o espelho">
-        <div id="hotspots"></div>
     </div>
 
     <div id="top-hud" class="hidden" aria-label="Controles do jogo">
@@ -65,7 +73,7 @@
     </div>
 
     <aside id="inventory" class="hidden" aria-live="polite" aria-label="Inventário">
-        <div class="overlay-card">
+        <div class="overlay-card panel-card">
             <button id="inventory-close" class="overlay-close" type="button" aria-label="Fechar inventário">×</button>
             <span>INVENTÁRIO</span>
             <div id="inventory-items" class="inventory-grid">Vazio</div>
@@ -73,7 +81,7 @@
     </aside>
 
     <aside id="pause-menu" class="hidden" aria-label="Menu de pausa">
-        <div class="pause-card">
+        <div class="overlay-card pause-card">
             <h2>JOGO PAUSADO</h2>
             <button id="save-button" type="button">Salvar jogo</button>
             <p id="save-feedback" role="status" aria-live="polite"></p>
@@ -100,9 +108,7 @@
     </div>
 
     <div id="interface" class="hidden">
-        <button id="blindfold-button">
-            Retirar venda
-        </button>
+        <button id="blindfold-button" class="hidden" type="button">Colocar venda</button>
         <div id="scene-actions"></div>
     </div>
 
@@ -122,7 +128,7 @@
 
     <!-- DOCUMENTOS E LIVRO -->
     <section id="document-viewer" class="reading-modal hidden" role="dialog" aria-modal="true" aria-labelledby="document-title">
-        <div class="overlay-card reading-card document-card">
+        <div class="overlay-card panel-card reading-card document-card">
             <button id="document-close" class="overlay-close" type="button" aria-label="Fechar documento">×</button>
             <p class="safe-kicker">ITEM DO INVENTÁRIO</p>
             <h2 id="document-title">DOCUMENTO</h2>
@@ -134,7 +140,7 @@
     </section>
 
     <section id="book-reader" class="reading-modal hidden" role="dialog" aria-modal="true" aria-labelledby="book-page-title">
-        <div class="overlay-card reading-card book-card">
+        <div class="overlay-card panel-card reading-card book-card">
             <button id="book-close" class="overlay-close" type="button" aria-label="Fechar livro">×</button>
             <p class="safe-kicker">LIVRO</p>
             <h2 id="book-page-title"></h2>
@@ -157,16 +163,16 @@
 
     <section id="dialogue" class="hidden">
     <p id="dialogue-speaker" class="hidden"></p>
-    <p id="dialogue-skip-hint">PRESSIONE ESPAÇO PARA PULAR</p>
+    <p id="dialogue-skip-hint" class="skip-hint">PRESSIONE ESPAÇO PARA PULAR</p>
     <p id="dialogue-text"></p>
     <div id="dialogue-choices"></div>
-    <button id="dialogue-next">Continuar</button>
+    <button id="dialogue-next" type="button">Continuar</button>
     </section>
 
     <section id="game-over" class="screen hidden">
         <h1>YOU HAVE BEEN DISCOVERED</h1>
         <p>MEE teve sua verdadeira identidade revelada.</p>
-        <button id="restart-button">RESTART</button>
+        <button id="restart-button" type="button">RESTART</button>
     </section>
 
     <div id="crt-overlay"></div>
@@ -174,7 +180,6 @@
 
     </main>
 
-    <script type="module" src="core/game-services.js"></script>
-    <script type="module" src="game.js"></script>
+    <script type="module" src="main.js"></script>
 </body>
 </html>

@@ -1,0 +1,159 @@
+/* ========================================
+   OBJETIVOS (autocontido; usado por ui/objectives.js)
+======================================== */
+
+#objectives {
+    position: absolute;
+    inset: 0;
+    z-index: 30;
+
+    display: grid;
+    place-items: center;
+
+    padding: 24px;
+    background: var(--color-backdrop);
+    color: var(--color-panel-text);
+    font-size: 12px;
+
+    pointer-events: auto;
+}
+
+#objectives .overlay-card {
+    width: min(620px, 92vw);
+    max-height: min(760px, 88vh);
+    overflow: auto;
+    padding: 34px;
+
+    background: var(--color-panel-bg);
+    border: 2px solid var(--color-panel-border);
+    box-shadow:
+        0 0 0 10px var(--color-panel-frame),
+        0 18px 50px var(--color-shadow-strong);
+}
+
+#objectives .objectives-title {
+    display: block;
+    color: var(--color-accent);
+    margin-bottom: 20px;
+}
+
+#objectives .overlay-close {
+    color: var(--color-text-bright);
+    background: var(--color-panel-close-bg);
+    border: 2px solid var(--color-panel-frame);
+}
+
+#objectives .overlay-close:focus-visible {
+    outline: 3px solid var(--color-highlight);
+    outline-offset: 3px;
+}
+
+.objectives-label {
+    margin: 16px 0 8px;
+    color: var(--color-label);
+    font-size: 10px;
+}
+
+.objective-current {
+    padding: 14px 12px;
+
+    border: 2px solid var(--color-panel-border);
+    background: var(--color-slot-bg);
+    box-shadow: inset 0 0 0 2px var(--color-highlight);
+
+    color: var(--color-highlight-text);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.objective-current::before {
+    content: "> ";
+    color: var(--color-highlight);
+}
+
+.objectives-list {
+    display: grid;
+    gap: 6px;
+    list-style: none;
+}
+
+.objective-done {
+    padding: 8px 12px;
+
+    border: 2px solid var(--color-panel-border);
+    background: var(--color-slot-done-bg);
+
+    color: var(--color-text-done);
+    text-decoration: line-through;
+    line-height: 1.4;
+}
+
+/* AVISO DE NOVO OBJETIVO */
+
+#objective-toast {
+    position: absolute;
+    top: 64px;
+    left: 50%;
+    z-index: 35;
+    transform: translateX(-50%);
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: min(560px, 90vw);
+    padding: 10px 16px;
+
+    background: var(--color-toast-bg);
+    border: 1px solid var(--color-highlight);
+    box-shadow: 0 8px 24px var(--color-shadow);
+
+    color: var(--color-highlight-text);
+    font-size: 11px;
+
+    pointer-events: none;
+}
+
+#objective-toast span {
+    color: var(--color-highlight);
+    white-space: nowrap;
+}
+
+#objective-toast.objective-toast-show {
+    animation: objective-toast-in 3.5s ease forwards;
+}
+
+@keyframes objective-toast-in {
+    0% { opacity: 0; transform: translate(-50%, -10px); }
+    10% { opacity: 1; transform: translate(-50%, 0); }
+    85% { opacity: 1; transform: translate(-50%, 0); }
+    100% { opacity: 0; transform: translate(-50%, -6px); }
+}
+
+#objectives-toggle.objective-pulse {
+    animation: objective-pulse 0.9s ease-in-out 4;
+}
+
+@keyframes objective-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 transparent; border-color: var(--color-button-border); }
+    50% { box-shadow: 0 0 0 4px var(--color-highlight-glow); border-color: var(--color-highlight); }
+}
+
+@media (max-width: 640px) {
+    #objective-toast {
+        top: 54px;
+        font-size: 9px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    #objectives .overlay-card {
+        padding: 28px 18px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #objective-toast.objective-toast-show,
+    #objectives-toggle.objective-pulse {
+        animation: none;
+    }
+}

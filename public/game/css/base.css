@@ -1,0 +1,186 @@
+/* ========================================
+   PALETA (todas as cores do jogo)
+   Troque os valores aqui para mudar o visual.
+======================================== */
+
+:root {
+    /* Base */
+    --color-bg: #111;
+    --color-black: #000;
+    --color-text: white;
+    --color-text-bright: #f1f1f1;
+    --color-text-dim: #777;
+    --color-text-muted: #aaa;
+
+    /* Botões */
+    --color-button-bg: #242424;
+    --color-button-hover: #444;
+    --color-button-border: #aaa;
+
+    /* Destaques */
+    --color-accent: #bd9c9c;        /* rótulos, falante, bateria, títulos de painel */
+    --color-danger: #a52d2d;        /* bateria baixa, escolha em foco */
+    --color-error: #e18484;
+    --color-highlight: #d3b37a;     /* foco e objetivo atual */
+    --color-highlight-text: #f1e3c4;
+    --color-highlight-glow: rgba(211, 179, 122, 0.55);
+
+    /* Cartões e painéis */
+    --color-border: #777;
+    --color-card-bg: rgba(16, 16, 16, 0.98);
+    --color-hud-bg: rgba(10, 10, 10, 0.86);
+    --color-backdrop: rgba(0, 0, 0, 0.72);
+    --color-backdrop-strong: rgba(0, 0, 0, 0.78);
+    --color-shadow: rgba(0, 0, 0, 0.5);
+    --color-shadow-strong: rgba(0, 0, 0, 0.7);
+    --color-panel-bg: #2b2b2d;
+    --color-panel-border: #17171a;
+    --color-panel-frame: #55565c;
+    --color-panel-text: #d8d8d8;
+    --color-panel-close-bg: #19191c;
+    --color-slot-bg: #39393f;
+    --color-slot-hover: #45454c;
+    --color-slot-done-bg: #313136;
+    --color-text-done: #77777e;
+    --color-label: #8f8f96;
+    --color-hint-text: #9a9a9a;
+    --color-book-text: #e6dccf;
+    --color-toast-bg: rgba(16, 16, 16, 0.94);
+
+    /* HUD */
+    --color-battery-track: #201b1b;
+
+    /* Telas (boot, game over, fim do capítulo) */
+    --color-screen-bg: #101410;
+    --color-screen-overlay: rgba(0, 0, 0, 0.95);
+    --color-terminal-text: #e72626;
+    --color-terminal-log: #b59e9e;
+    --color-terminal-rule: #6a4545;
+    --color-progress-track: #332929;
+    --color-progress-fill: #ce8c8c;
+    --color-alert-title: #b83232;
+
+    /* Tela inicial */
+    --color-start-dim: rgba(0, 0, 0, 0.45);
+    --color-start-text: #a5a5a5;
+    --color-start-meta: #858585;
+    --color-brand: #b20e13;
+    --color-brand-hover: #e3262b;
+    --color-brand-glow: rgba(178, 14, 19, 0.5);
+    --color-brand-dark: #7d0707;
+
+    /* Diálogo */
+    --color-dialogue-bg: rgba(10, 10, 10, 0.96);
+    --color-mee-speech: #a50707;
+    --color-mee-glow: rgba(230, 168, 168, 0.3);
+    --color-choice-bg: #171717;
+    --color-choice-text: #ccc;
+
+    /* Cofre */
+    --color-safe-backdrop: rgba(5, 7, 9, 0.72);
+    --color-safe-bg: #111215;
+    --color-safe-border: #9b7777;
+    --color-input-bg: #08090b;
+
+    /* Efeitos */
+    --color-blindfold-tint: rgba(0, 0, 0, 0.38);
+    --color-crt-scanline: rgba(0, 0, 0, 0.12);
+    --color-crt-vignette: rgba(0, 0, 0, 0.35);
+    --color-crt-inner-shadow: rgba(0, 0, 0, 0.65);
+    --color-crt-tint: rgba(180, 20, 20, 0.08);
+    --color-crt-glitch: rgba(180, 20, 20, 0.035);
+    --color-crt-sheen: rgba(255, 255, 255, 0.025);
+}
+
+/* ========================================
+   CONFIGURAÇÕES GERAIS
+======================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Silkscreen', monospace;
+}
+
+body {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    overflow: hidden;
+}
+
+button {
+    cursor: pointer;
+    border: 1px solid var(--color-button-border);
+    background: var(--color-button-bg);
+    color: var(--color-text);
+    padding: 12px 20px;
+    font-size: 14px;
+}
+
+button:hover {
+    background: var(--color-button-hover);
+}
+
+.hidden {
+    display: none !important;
+}
+
+#game {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+}
+
+/* ========================================
+   CARTÕES E BOTÕES DE FECHAMENTO
+======================================== */
+
+.overlay-card {
+    position: relative;
+    width: min(560px, 90vw);
+    padding: 28px;
+
+    background: var(--color-card-bg);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 12px 40px var(--color-shadow);
+}
+
+/* Cartão com moldura (inventário e leitores) */
+.panel-card {
+    background: var(--color-panel-bg);
+    border: 2px solid var(--color-panel-border);
+    box-shadow:
+        0 0 0 10px var(--color-panel-frame),
+        0 18px 50px var(--color-shadow-strong);
+}
+
+.overlay-close {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+
+    padding: 2px 8px;
+    font-size: 22px;
+    line-height: 1;
+}
+
+.panel-card .overlay-close {
+    color: var(--color-text-bright);
+    background: var(--color-panel-close-bg);
+    border: 2px solid var(--color-panel-frame);
+}
+
+.panel-card button:focus-visible {
+    outline: 3px solid var(--color-highlight);
+    outline-offset: 3px;
+}
+
+.skip-hint {
+    color: var(--color-text-dim);
+    font-size: 10px;
+    text-align: left;
+}
