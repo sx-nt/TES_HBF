@@ -52,6 +52,18 @@ button:hover {
     aspect-ratio: 2048 / 682;
 }
 
+#mirror-key-overlay {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: clamp(72px, 14%, 180px);
+    height: auto;
+    transform: translate(-50%, -50%);
+    image-rendering: pixelated;
+    pointer-events: none;
+    z-index: 2;
+}
+
 #background {
     display: block;
     width: 100%;
