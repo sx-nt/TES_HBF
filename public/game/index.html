@@ -49,6 +49,7 @@
     <!-- CENÁRIO -->
     <div id="scene" class="hidden">
         <img id="background" src="" alt="Cenário">
+        <img id="mirror-key-overlay" class="hidden" src="assets/items/chave.png" alt="Chave sobre o espelho">
         <div id="hotspots"></div>
     </div>
 
@@ -63,14 +64,21 @@
     </div>
 
     <aside id="inventory" class="hidden" aria-live="polite" aria-label="Inventário">
-        <span>INVENTÁRIO</span>
-        <div id="inventory-items">Vazio</div>
+        <div class="overlay-card">
+            <button id="inventory-close" class="overlay-close" type="button" aria-label="Fechar inventário">×</button>
+            <span>INVENTÁRIO</span>
+            <div id="inventory-items" class="inventory-grid">Vazio</div>
+        </div>
     </aside>
 
     <aside id="pause-menu" class="hidden" aria-label="Menu de pausa">
-        <h2>JOGO PAUSADO</h2>
-        <button id="resume-button" type="button">Continuar</button>
-        <button id="pause-restart-button" type="button">Reiniciar</button>
+        <div class="pause-card">
+            <h2>JOGO PAUSADO</h2>
+            <button id="save-button" type="button">Salvar jogo</button>
+            <p id="save-feedback" role="status" aria-live="polite"></p>
+            <button id="resume-button" type="button">Continuar</button>
+            <button id="pause-restart-button" type="button">Reiniciar</button>
+        </div>
     </aside>
 
     <div id="interface" class="hidden">
@@ -79,6 +87,20 @@
         </button>
         <div id="scene-actions"></div>
     </div>
+
+    <section id="safe-panel" class="hidden" aria-label="Cofre">
+        <div class="safe-card">
+            <p class="safe-kicker">COFRE OCULTO</p>
+            <h2>INSIRA A SENHA</h2>
+            <label for="safe-code">Código de cinco dígitos</label>
+            <input id="safe-code" inputmode="numeric" maxlength="5" autocomplete="off" aria-describedby="safe-feedback">
+            <p id="safe-feedback" class="safe-feedback" role="status"></p>
+            <div class="safe-actions">
+                <button id="safe-cancel" type="button">Voltar</button>
+                <button id="safe-submit" type="button">Confirmar</button>
+            </div>
+        </div>
+    </section>
 
     <section id="dialogue" class="hidden">
     <p id="dialogue-speaker" class="hidden"></p>

@@ -52,6 +52,18 @@ button:hover {
     aspect-ratio: 2048 / 682;
 }
 
+#mirror-key-overlay {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: clamp(72px, 14%, 180px);
+    height: auto;
+    transform: translate(-50%, -50%);
+    image-rendering: pixelated;
+    pointer-events: none;
+    z-index: 2;
+}
+
 #background {
     display: block;
     width: 100%;
@@ -100,9 +112,19 @@ button:hover {
     top: 68px;
     left: 24px;
     right: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     padding: 7px 12px;
     font-size: 11px;
     z-index: 13;
+}
+
+#blindfold-button img {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+    image-rendering: pixelated;
 }
 
 #scene-actions {
@@ -116,20 +138,118 @@ button:hover {
 
 #inventory {
     position: absolute;
-    top: 24px;
-    left: 24px;
-    z-index: 8;
-    padding: 10px 14px;
-    background: rgba(10, 10, 10, 0.86);
-    border: 1px solid #777;
+    inset: 0;
+    z-index: 20;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: rgba(0, 0, 0, 0.72);
     color: #d8d8d8;
     font-size: 12px;
+    pointer-events: auto;
+}
+
+#inventory.hidden { display: none; }
+
+.overlay-card,
+.pause-card {
+    position: relative;
+    width: min(560px, 90vw);
+    padding: 28px;
+    background: rgba(16, 16, 16, 0.98);
+    border: 1px solid #777;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+}
+
+#inventory .overlay-card {
+    width: min(920px, 92vw);
+    max-height: min(760px, 88vh);
+    overflow: auto;
+    padding: 34px;
+    background: #2b2b2d;
+    border: 2px solid #17171a;
+    box-shadow: 0 0 0 10px #55565c, 0 18px 50px rgba(0, 0, 0, 0.7);
+}
+
+#inventory .overlay-close {
+    color: #f1f1f1;
+    background: #19191c;
+    border: 2px solid #55565c;
+}
+
+#inventory .overlay-close:focus-visible,
+#inventory .inventory-item:focus-visible {
+    outline: 3px solid #d3b37a;
+    outline-offset: 3px;
 }
 
 #inventory span {
+    display: block;
     color: #bd9c9c;
-    margin-right: 10px;
+    margin-bottom: 20px;
 }
+
+.overlay-close {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    padding: 2px 8px;
+    font-size: 22px;
+    line-height: 1;
+}
+
+.inventory-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.inventory-item {
+    min-height: 142px;
+    display: grid;
+    place-items: center;
+    gap: 8px;
+    padding: 14px 10px;
+    border: 2px solid #17171a;
+    background: #39393f;
+    box-shadow: inset 0 0 0 2px #55565c;
+    text-align: center;
+}
+
+.inventory-item img {
+    width: 78px;
+    height: 78px;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+@media (max-width: 680px) {
+    .inventory-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    #inventory .overlay-card {
+        padding: 28px 18px;
+    }
+}
+
+#pause-menu {
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: rgba(0, 0, 0, 0.72);
+    pointer-events: auto;
+}
+
+#pause-menu.hidden { display: none; }
+
+.pause-card {
+    display: grid;
+    gap: 12px;
+    text-align: center;
+}
+
+#save-feedback { min-height: 1em; color: #bd9c9c; }
 
 
 /* BOOT E GAME OVER */
@@ -194,6 +314,64 @@ button:hover {
 #game-over h1 {
     color: #b83232;
 }
+
+/* COFRE */
+
+#safe-panel {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    display: grid;
+    place-items: center;
+    background: rgba(5, 7, 9, 0.72);
+    backdrop-filter: blur(2px);
+}
+
+.safe-card {
+    width: min(430px, calc(100% - 32px));
+    padding: 26px;
+    border: 1px solid #9b7777;
+    background: #111215;
+    box-shadow: 0 18px 60px rgba(0, 0, 0, 0.7);
+}
+
+.safe-kicker {
+    color: #bd9c9c;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    margin-bottom: 10px;
+}
+
+.safe-card h2 {
+    margin-bottom: 22px;
+    font-size: 18px;
+}
+
+.safe-card label {
+    display: block;
+    margin-bottom: 8px;
+    color: #aaa;
+    font-size: 11px;
+}
+
+#safe-code {
+    width: 100%;
+    border: 1px solid #777;
+    background: #08090b;
+    color: white;
+    padding: 12px;
+    font: inherit;
+    letter-spacing: 0.3em;
+}
+
+.safe-feedback {
+    min-height: 20px;
+    margin-top: 10px;
+    font-size: 11px;
+}
+
+.safe-feedback.error { color: #e18484; }
+.safe-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 12px; }
 
 /* DIÁLOGOS */
 

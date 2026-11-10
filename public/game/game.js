@@ -70,6 +70,33 @@ const scenes = {
             unblindfolded: "assets/maps/S_Venda/ww_sem_venda.png"
         },
         hotspots: []
+    },
+
+    quadroZoom: {
+        hasHuman: false,
+        images: {
+            blindfolded: "assets/maps/S_Venda/zoom_quadro_com_venda.png",
+            unblindfolded: "assets/maps/S_Venda/zoom_quadro_sem_venda.png"
+        },
+        hotspots: []
+    },
+
+    cofre: {
+        hasHuman: false,
+        images: {
+            blindfolded: "assets/maps/S_Venda/zoom_cofre_sem_venda.png",
+            unblindfolded: "assets/maps/S_Venda/zoom_cofre_sem_venda.png"
+        },
+        hotspots: []
+    },
+
+    cofreAberto: {
+        hasHuman: false,
+        images: {
+            blindfolded: "assets/maps/S_Venda/zoom_cofre_aberto.png",
+            unblindfolded: "assets/maps/S_Venda/zoom_cofre_aberto.png"
+        },
+        hotspots: []
     }
 };
 
@@ -88,7 +115,15 @@ let hasHammer = false;
 let hasNails = false;
 let windowsExamined = false;
 let windowsCovered = false;
-let battery = 100;
+let pictureExamined = false;
+let safeOpen = false;
+let bookCollected = false;
+let keyCollected = false;
+let cabinetUnlocked = false;
+let passwordFound = false;
+let machineExamined = false;
+  let machineZoomActive = false;
+  let battery = 100;
 let isPaused = false;
 let bootInterval = null;
 
@@ -248,7 +283,15 @@ function startGame() {
     hasNails = false;
     windowsExamined = false;
     windowsCovered = false;
-    battery = 100;
+    pictureExamined = false;
+    safeOpen = false;
+    bookCollected = false;
+    keyCollected = false;
+    cabinetUnlocked = false;
+    passwordFound = false;
+machineExamined = false;
+  machineZoomActive = false;
+  battery = 100;
     isPaused = false;
     updateInventory();
     updateBattery();
@@ -262,9 +305,17 @@ function startGame() {
 function loadScene(sceneName, onLoaded = null) {
     const scene = scenes[sceneName];
 
-    const imagePath = blindfoldOn
+    let imagePath = blindfoldOn
         ? scene.images.blindfolded
         : scene.images.unblindfolded;
+
+    if (sceneName === "quarto" && !blindfoldOn && pictureExamined) {
+        imagePath = "assets/maps/S_Venda/quarto_sem_venda_cofre.png";
+    }
+
+    if (sceneName === "construcao" && machineZoomActive && !blindfoldOn) {
+        imagePath = "assets/maps/S_Venda/maquina_zoom_sem_venda.png";
+    }
 
     document.getElementById("scene-actions").innerHTML = "";
 
@@ -285,6 +336,11 @@ function loadScene(sceneName, onLoaded = null) {
             document.getElementById("scene").classList.remove("hidden");
             document.getElementById("interface").classList.remove("hidden");
             document.getElementById("game").classList.toggle("blindfold-active", blindfoldOn);
+
+            const mirrorKeyOverlay = document.getElementById("mirror-key-overlay");
+            if (mirrorKeyOverlay) {
+                mirrorKeyOverlay.classList.toggle("hidden", !(sceneName === "mirror" && !blindfoldOn && !keyCollected));
+            }
 
             createHotspots(scene.hotspots || []);
             updateInterface();
@@ -356,34 +412,55 @@ function updateSceneActions() {
     }
 
     if (currentScene === "houseFront") {
-        if (!toolsExamined) {
-            addAction("Examinar ferramentas", examineTools);
-        } else if (!hasHammer || !hasNails) {
-            addAction("Examinar ferramentas novamente", examineTools);
-        }
-
+        if (!toolsExamined) addAction("Examinar ferramentas", examineTools);
+        if (toolsExamined && (!hasHammer || !hasNails)) addAction("Coletar ferramentas", collectTools);
         addAction("Entrar na casa", () => loadScene("quarto"));
     }
 
     if (currentScene === "quarto") {
-        if (!windowsExamined) addAction("Examinar janela", examineWindow);
+    if (!windowsCovered) addAction("Examinar janelas", examineWindow);
+    addAction("Examinar quadro", examinePicture);
         addAction("Examinar espelho", () => loadScene("mirror"));
-        if (windowsCovered && !blindfoldOn) {
+        addAction("Examinar armário", examineCabinet);
+        if (windowsCovered && !blindfoldOn && toolsExamined && hasHammer && hasNails) {
             addAction("Ir para a construção", () => loadScene("construcao"));
         }
         addAction("Voltar aos portões", returnToGates);
     }
 
+    if (currentScene === "quadroZoom") {
+        if (!pictureExamined) addAction("Remover o quadro", removePicture);
+        if (pictureExamined) addAction("Acessar cofre", () => loadScene("cofre"));
+        addAction("Voltar ao quarto", () => loadScene("quarto"));
+    }
+
+    if (currentScene === "cofre") {
+        addAction("Voltar", () => loadScene("quadroZoom"));
+        if (!safeOpen) {
+            addAction("Inserir senha", openSafePanel);
+        }
+    }
+
+    if (currentScene === "cofreAberto") {
+        if (!bookCollected) addAction("Pegar o livro", collectBook);
+        addAction("Voltar ao quarto", () => loadScene("quarto"));
+    }
+
     if (currentScene === "ww") {
         if (!windowsCovered) addAction("Tapar as janelas", coverWindows);
-        if (windowsCovered && !blindfoldOn) addAction("Voltar ao quarto", () => loadScene("quarto"));
+        addAction("Voltar ao quarto", () => loadScene("quarto"));
     }
 
     if (currentScene === "mirror") {
+        if (!keyCollected && !blindfoldOn) {
+            addAction("Coletar chave", collectKey);
+        }
         addAction("Voltar ao quarto", () => loadScene("quarto"));
     }
 
     if (currentScene === "construcao") {
+        if (!machineExamined) addAction("Examinar máquina destruída", examineMachine);
+        else addAction("Interagir com a máquina", examineMachine);
         addAction("Voltar ao quarto", () => loadScene("quarto"));
     }
 }
@@ -400,12 +477,25 @@ function addAction(label, callback) {
 
 
 function updateInventory() {
-    const inventoryEl = document.getElementById("inventory");
     const itemsEl = document.getElementById("inventory-items");
-    if (!inventoryEl || !itemsEl) return;
-    itemsEl.textContent = inventory.length
-        ? inventory.map(item => item === "madeira" ? "MADEIRA" : item.toUpperCase()).join(" • ")
-        : "Vazio";
+    if (!itemsEl) return;
+    itemsEl.replaceChildren();
+    if (!inventory.length) {
+        itemsEl.textContent = "Vazio";
+        return;
+    }
+
+    inventory.forEach((item) => {
+        const card = document.createElement("div");
+        card.className = "inventory-item";
+        const image = document.createElement("img");
+        image.src = item === "chave do armário" ? "assets/items/chave.png" : "assets/images/eye_open_icon.png";
+        image.alt = item;
+        const label = document.createElement("span");
+        label.textContent = item.toUpperCase();
+        card.append(image, label);
+        itemsEl.appendChild(card);
+    });
 }
 
 function updateBattery() {
@@ -422,6 +512,28 @@ function toggleInventory() {
     const isOpen = !panel.classList.contains("hidden");
     panel.classList.toggle("hidden", isOpen);
     button.setAttribute("aria-expanded", String(!isOpen));
+}
+
+function updateBlindfoldButton() {
+    const button = document.getElementById("blindfold-button");
+    if (!button) return;
+    button.replaceChildren();
+    const image = document.createElement("img");
+    image.src = blindfoldOn ? "assets/images/eye_closed_icon.png" : "assets/images/eye_open_icon.png";
+    image.alt = blindfoldOn ? "Colocar venda" : "Retirar venda";
+    button.appendChild(image);
+    button.setAttribute("aria-label", blindfoldOn ? "Retirar venda" : "Colocar venda");
+}
+
+function saveGame() {
+    const saveState = {
+        blindfoldOn, hasBlindfold, computerExamined, debrisExamined, inventory,
+        gatesReady, toolsExamined, hasHammer, hasNails, windowsExamined, windowsCovered,
+        pictureExamined, safeOpen, bookCollected, keyCollected, cabinetUnlocked,
+        passwordFound, machineExamined, machineZoomActive, battery, currentScene
+    };
+    localStorage.setItem("mee-save", JSON.stringify(saveState));
+    document.getElementById("save-feedback").textContent = "Jogo salvo neste navegador.";
 }
 
 function togglePause() {
@@ -484,7 +596,13 @@ function startGatesSequence() {
                         label: "Seguir O Agente",
                         action: () => {
                             gatesReady = true;
-                            loadScene("houseFront");
+                            loadScene("houseFront", () => {
+                                showDialogue([
+                                    "MEE chega à residência designada.",
+                                    "A casa parece vazia... mas alguém esteve aqui recentemente.",
+                                    "Vou entrar e examinar o local."
+                                ], updateSceneActions, "MEE");
+                            });
                         }
                     }
                 ], "O AGENTE");
@@ -501,18 +619,136 @@ function startGatesSequence() {
 }
 
 function examineTools() {
+    if (toolsExamined) return;
     toolsExamined = true;
-    hasHammer = true;
-    hasNails = true;
     showDialogue([
-        "Você encontrou um martelo e alguns pregos.",
-        "MEE SYSTEM: Ferramentas coletadas."
+        "Há um martelo e alguns pregos entre as ferramentas.",
+        "Preciso coletar tudo antes de deixar esta ação concluída."
     ], updateSceneActions, "MEE");
 }
 
+function collectTools() {
+    if (!toolsExamined || (hasHammer && hasNails)) return;
+    hasHammer = true;
+    hasNails = true;
+    inventory.push("martelo", "pregos");
+    updateInventory();
+    showDialogue(["Martelo e pregos adicionados ao inventário."], updateSceneActions, "MEE SYSTEM");
+}
+
+function collectKey() {
+    if (blindfoldOn || keyCollected) {
+        if (blindfoldOn) showDialogue(["Não consigo encontrar a chave enquanto estou vendado."], updateSceneActions, "MEE");
+        return;
+    }
+  keyCollected = true;
+  const mirrorKeyOverlay = document.getElementById("mirror-key-overlay");
+  if (mirrorKeyOverlay) mirrorKeyOverlay.classList.add("hidden");
+  inventory.push("chave do armário");
+    updateInventory();
+    showDialogue(["A chave encontrada no espelho foi adicionada ao inventário."], updateSceneActions, "MEE SYSTEM");
+}
+
+function examineCabinet() {
+    if (blindfoldOn) {
+        showDialogue(["Não consigo examinar o armário enquanto estou vendado."], updateSceneActions, "MEE");
+        return;
+    }
+
+    if (!cabinetUnlocked) {
+        if (!keyCollected) {
+            showDialogue(["O armário está trancado. Preciso encontrar uma chave."], updateSceneActions, "MEE");
+            return;
+        }
+        cabinetUnlocked = true;
+    }
+
+    if (!passwordFound) {
+        passwordFound = true;
+        inventory.push("senha do cofre");
+        updateInventory();
+        showDialogue(["A gaveta está aberta. A senha do cofre foi adicionada ao inventário."], updateSceneActions, "MEE SYSTEM");
+    } else {
+        showDialogue(["O armário está destrancado. A gaveta já foi examinada."], updateSceneActions, "MEE");
+    }
+}
+
+function examineMachine() {
+    if (!machineExamined) {
+        machineExamined = true;
+        machineZoomActive = true;
+        loadScene("construcao", () => showDialogue(
+            ["A máquina destruída ainda guarda sinais de energia."],
+            () => {
+                machineZoomActive = false;
+                loadScene("construcao");
+            },
+            "MEE"
+        ));
+        return;
+    }
+    showDialogue(["Não há mais nada que eu possa retirar da máquina."], updateSceneActions, "MEE");
+}
+
+function examinePicture() {
+    if (blindfoldOn) {
+        showDialogue(["Não consigo examinar o quadro enquanto estou vendado."], updateSceneActions, "MEE");
+        return;
+    }
+
+    loadScene("quadroZoom", () => {
+        showDialogue(["Parece que tem algo de estranho nesse quadro..."], updateSceneActions, "MEE");
+    });
+}
+
+function removePicture() {
+    pictureExamined = true;
+    loadScene("cofre", () => {
+        showDialogue(["O quadro escondia um cofre embutido na parede."], updateSceneActions, "MEE");
+    });
+}
+
+function openSafePanel() {
+    const panel = document.getElementById("safe-panel");
+    const input = document.getElementById("safe-code");
+    const feedback = document.getElementById("safe-feedback");
+    panel.classList.remove("hidden");
+    feedback.textContent = "";
+    input.value = "";
+    input.focus();
+}
+
+function closeSafePanel() {
+    document.getElementById("safe-panel").classList.add("hidden");
+}
+
+function submitSafeCode() {
+    const input = document.getElementById("safe-code");
+    const feedback = document.getElementById("safe-feedback");
+    if (input.value.trim() !== "03030") {
+        feedback.textContent = "SENHA INCORRETA";
+        feedback.className = "safe-feedback error";
+        return;
+    }
+
+    safeOpen = true;
+    closeSafePanel();
+    loadScene("cofreAberto", () => {
+        showDialogue(["Senha correta. O cofre foi aberto.", "Há um livro dentro. Vou guardá-lo."], updateSceneActions, "MEE");
+    });
+}
+
+function collectBook() {
+    if (bookCollected) return;
+    bookCollected = true;
+    inventory.push("livro");
+    updateInventory();
+    updateSceneActions();
+    showDialogue(["Livro adicionado ao inventário."], updateSceneActions, "MEE SYSTEM");
+}
+
 function examineWindow() {
-    if (windowsExamined) return;
-    windowsExamined = true;
+    if (!windowsExamined) windowsExamined = true;
     loadScene("ww", () => {
         showDialogue([
             "Parece que estou sendo vigiado...",
@@ -523,9 +759,17 @@ function examineWindow() {
 }
 
 function coverWindows() {
+    if (!toolsExamined || !hasHammer || !hasNails) {
+        showDialogue(["Ainda não posso tapar as janelas: preciso coletar o martelo e os pregos."], updateSceneActions, "MEE SYSTEM");
+        return;
+    }
     windowsCovered = true;
 
     loadScene("quarto", () => {
+        if (blindfoldOn) {
+            document.getElementById("background").src = "assets/maps/C_Venda/quarto_com_venda_janela_tapada.png";
+        }
+
         showDialogue([
             "Ótimo. Agora que as janelas estão cobertas, posso retirar a venda sem correr o risco de ser visto."
         ], null, "MEE");
@@ -875,12 +1119,21 @@ function restartGame() {
     hasNails = false;
     windowsExamined = false;
     windowsCovered = false;
-    battery = 100;
+    pictureExamined = false;
+    safeOpen = false;
+    bookCollected = false;
+    keyCollected = false;
+    cabinetUnlocked = false;
+    passwordFound = false;
+machineExamined = false;
+  machineZoomActive = false;
+  battery = 100;
     isPaused = false;
     document.getElementById("top-hud").classList.add("hidden");
     document.getElementById("pause-menu").classList.add("hidden");
     updateInventory();
     updateBattery();
+    updateBlindfoldButton();
 
     if (bootInterval !== null) {
         clearInterval(bootInterval);
@@ -906,8 +1159,16 @@ document.getElementById("start-button").addEventListener("click", () => {
 });
 
 document.getElementById("restart-button").addEventListener("click", restartGame);
+document.getElementById("safe-cancel").addEventListener("click", closeSafePanel);
+document.getElementById("safe-submit").addEventListener("click", submitSafeCode);
+document.getElementById("safe-code").addEventListener("keydown", (event) => {
+    if (event.key === "Enter") submitSafeCode();
+});
 document.getElementById("blindfold-button").addEventListener("click", toggleBlindfold);
 document.getElementById("inventory-toggle").addEventListener("click", toggleInventory);
+document.getElementById("inventory-close").addEventListener("click", toggleInventory);
+document.getElementById("save-button").addEventListener("click", saveGame);
+updateBlindfoldButton();
 document.getElementById("pause-button").addEventListener("click", togglePause);
 document.getElementById("resume-button").addEventListener("click", togglePause);
 document.getElementById("pause-restart-button").addEventListener("click", () => {
