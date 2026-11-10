@@ -849,11 +849,14 @@ function startTypingVoice() {
   const isDestroyedMachineDialogue = currentScene === "construcao" && machineZoomActive;
   const voicePath = isDestroyedMachineDialogue
     ? dialogueVoiceBySpeaker["MAQUINA"]
-    : dialogueVoiceBySpeaker[speaker] || dialogueVoiceBySpeaker["MEE SYSTEM"];
+    : dialogueVoiceBySpeaker[speaker];
+
+  if (!voicePath) return;
+
   typingVoice = new Audio(voicePath);
-    typingVoice.loop = true;
-    typingVoice.volume = 0.35;
-    typingVoice.play().catch(() => {});
+  typingVoice.loop = true;
+  typingVoice.volume = 0.35;
+  typingVoice.play().catch(() => {});
 }
 
 function typeText(element, text, speed = 35) {
