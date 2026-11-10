@@ -70,6 +70,14 @@
           }
       ]
   },
+  "officerWarning": {
+    "speaker": "O AGENTE",
+    "lines": ["Ei! Você não deveria estar aqui fora.", "Volte para casa e não saia sem motivo."]
+  },
+  "windowWatchWarning": {
+    "speaker": "MEE SYSTEM",
+    "lines": ["ALERTA: Você está sendo observado pela janela.", "Não é seguro retirar a venda."]
+  },
   "computerAlreadyExamined": {
     "speaker": "MÁQUINA DESTRUIDA",
     "lines": ["Já te falei tudo que sei. Agora vai!"]

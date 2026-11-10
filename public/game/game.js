@@ -447,8 +447,8 @@ function updateSceneActions() {
     addAction("Examinar quadro", examinePicture);
         addAction("Examinar espelho", () => loadScene("mirror"));
         addAction("Examinar armário", examineCabinet);
-        if (windowsCovered && !blindfoldOn && toolsExamined && hasHammer && hasNails) {
-            addAction("Ir para a construção", () => loadScene("construcao"));
+        if (windowsCovered && toolsExamined && hasHammer && hasNails) {
+            addAction("Ir para a construção", () => leaveHouse("construcao"));
         }
         addAction("Voltar aos portões", returnToGates);
     }
@@ -841,22 +841,29 @@ function coverWindows() {
         );
     });
 }
-function returnToGates() {
-    if (!hasBlindfold || blindfoldOn) {
+// SAIR DE CASA
+// Regra: o jogador só morre se sair de casa sem a venda.
+const OUTSIDE_HOUSE_SCENES = ["gates", "houseFront", "construcao"];
+const INSIDE_HOUSE_SCENES = ["quarto", "mirror", "ww", "quadroZoom", "cofre", "cofreAberto"];
+
+function leaveHouse(sceneName, onLoaded = null) {
+    if (!blindfoldOn) {
         gameOver();
         return;
     }
+    loadScene(sceneName, onLoaded);
+}
 
-    loadScene("gates", () => {
+function returnToGates() {
+    leaveHouse("gates", () => {
         const gatesBackground = document.getElementById("background");
         gatesBackground.src = "assets/maps/C_Venda/gates_officer.png";
-        const officer = getDialogue("officerWelcome");
-        showDialogue(["Oi. Ainda está por aqui?"], () => {
-            showChoiceDialogue("O Agente aguarda sua decisão.", [
-                { label: "Voltar para casa", action: () => loadScene("houseFront") },
-                { label: "Voltar para a praia", action: () => loadScene("beach") }
-            ], "O AGENTE");
-        }, officer.speaker);
+        const warning = getDialogue("officerWarning");
+        showDialogue(warning.lines, () => {
+            showChoiceDialogue("O Agente aguarda que você volte para casa.", [
+                { label: "Voltar para casa", action: () => loadScene("houseFront") }
+            ], "MEE SYSTEM");
+        }, warning.speaker);
     });
 }
 
@@ -869,11 +876,16 @@ function toggleBlindfold() {
     }
 
     if (blindfoldOn) {
-        if (
-            scenes[currentScene].hasHuman ||
-            (currentScene !== "beach" && !windowsCovered)
-        ) {
+        // Fora de casa sem a venda = morte
+        if (OUTSIDE_HOUSE_SCENES.includes(currentScene)) {
             gameOver();
+            return;
+        }
+
+        // Dentro de casa com janelas descobertas: bloqueia a remoção
+        if (INSIDE_HOUSE_SCENES.includes(currentScene) && !windowsCovered) {
+            const warning = getDialogue("windowWatchWarning");
+            showDialogue(warning.lines, updateSceneActions, warning.speaker);
             return;
         }
 
