@@ -731,6 +731,10 @@ function coverWindows() {
     windowsCovered = true;
 
     loadScene("quarto", () => {
+        if (blindfoldOn) {
+            document.getElementById("background").src = "assets/maps/C_Venda/quarto_com_venda_janela_tapada.png";
+        }
+
         showDialogue([
             "Ótimo. Agora que as janelas estão cobertas, posso retirar a venda sem correr o risco de ser visto."
         ], null, "MEE");
