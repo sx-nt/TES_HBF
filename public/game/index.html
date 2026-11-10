@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="css/readers.css">
     <link rel="stylesheet" href="css/safe.css">
     <link rel="stylesheet" href="css/effects.css">
+    <link rel="stylesheet" href="css/feira.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
@@ -158,6 +159,12 @@
     <section id="chapter-end" class="screen hidden" aria-label="Fim do capítulo">
         <h1>CAPÍTULO 1 ENCERRADO</h1>
         <p>Obrigado por jogar!</p>
+        <div id="feira-reward" class="hidden" aria-label="Feira de Jogos">
+            <p class="feira-title">FEIRA DE JOGOS</p>
+            <button id="feira-button" type="button">Resgatar tijolinhos na Feira de Jogos</button>
+            <div id="feira-google-button" class="hidden"></div>
+            <p id="feira-status" role="status" aria-live="polite"></p>
+        </div>
         <button id="chapter-end-restart" type="button">Jogar novamente</button>
     </section>
 

@@ -1,0 +1,51 @@
+/* ========================================
+   FEIRA DE JOGOS (resgate de tijolinhos no fim do capítulo)
+   Usa apenas as variáveis de cor definidas em base.css.
+======================================== */
+
+#feira-reward {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    max-width: 420px;
+    padding: 16px 20px;
+    border: 1px solid var(--color-border);
+    background: var(--color-card-bg);
+    box-shadow: 0 0 18px var(--color-shadow);
+}
+
+#feira-reward .feira-title {
+    margin: 0;
+    color: var(--color-accent);
+    font-size: 12px;
+    letter-spacing: 2px;
+}
+
+#feira-button:disabled {
+    cursor: default;
+    opacity: 0.5;
+}
+
+#feira-button:disabled:hover {
+    background: var(--color-button-bg);
+}
+
+#feira-google-button {
+    min-height: 44px;
+}
+
+#feira-status {
+    min-height: 1.4em;
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 13px;
+}
+
+#feira-status[data-kind="success"] {
+    color: var(--color-text-bright);
+}
+
+#feira-status[data-kind="error"] {
+    color: var(--color-error);
+}

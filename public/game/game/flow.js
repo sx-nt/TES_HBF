@@ -8,6 +8,7 @@ import { showHud, hideHud, closePause, updateBattery, updateBlindfoldButton } fr
 import { updateInventory, closeInventory } from "../ui/inventory.js";
 import { closeReadingModals } from "../ui/readers.js";
 import { closeSafePanel } from "../ui/safe.js";
+import { showFeiraReward, resetFeira } from "../ui/feira.js";
 import { loadScene, cancelSceneLoad } from "./scene-loader.js";
 import { startBoot } from "./boot.js";
 
@@ -33,6 +34,7 @@ export function startGame() {
 
     resetState();
     resetObjectives();
+    resetFeira();
 
     hideScreens("start-screen", "boot-screen", "game-over", "chapter-end", "scene", "interface");
     $("game").classList.remove("blindfold-active");
@@ -87,5 +89,6 @@ function showChapterEnd() {
     hideScreens("interface");
 
     $("chapter-end").classList.remove("hidden");
+    showFeiraReward();
     $("chapter-end-restart").focus();
 }
