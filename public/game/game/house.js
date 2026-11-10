@@ -79,10 +79,10 @@ export function examineCabinet() {
 
     state.cabinetUnlocked = true;
     state.documentFound = true;
-    addItem("documento");
+    addItem("identidade");
     showDialogue([
         "A gaveta foi aberta.",
-        "Há um documento dentro da gaveta. Talvez eu deva examiná-lo no inventário."
+        "Há uma carteira de identidade dentro da gaveta. Talvez eu deva examiná-la no inventário."
     ], withObjective("examinar-documento", "Examine o documento no inventário", refreshSceneUI), "MEE SYSTEM");
 }
 

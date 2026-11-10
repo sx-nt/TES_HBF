@@ -8,7 +8,7 @@ const ITEM_IMAGES = Object.freeze({
     "venda": "assets/items/venda.png",
     "madeira": "assets/items/madeira.png",
     "martelo": "assets/items/ferramentas.png",
-    "documento": "assets/items/id.png"
+    "identidade": "assets/items/id.png"
 });
 
 // Itens que podem ser abertos a partir do inventário: { item: { hint, action } }

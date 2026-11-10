@@ -26,7 +26,7 @@ setSceneUIRenderer(() => {
 });
 
 setOpenableItems({
-    "documento": { hint: "Abrir", action: openDocumentViewer },
+    "identidade": { hint: "Abrir", action: openDocumentViewer },
     "livro": { hint: "Ler", action: openBookReader }
 });
 
