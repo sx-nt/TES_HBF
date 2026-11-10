@@ -1,0 +1,132 @@
+{
+  "debrisFound": {
+    "speaker": "MEE",
+    "lines": ["Esses destroços ainda podem ser úteis.", "Vou separar alguns pedaços de madeira."]
+  },
+  "incomingPeople": {
+    "speaker": "MEE SYSTEM",
+    "lines": ["ALERTA: pessoas se aproximando.", "Mantenha a venda e não faça movimentos suspeitos."]
+  },
+  "officerWelcome": {
+      "steps": [
+          {
+              "type": "lines",
+              "speaker": "??",
+              "lines": [
+                  "Olá! ... Seja bem-vindo à cidade.",
+                  "Uma nova chegada. Que agradável.",
+                  "Vejo que é novo por aqui. Conheço praticamente todos que entram e saem pelos nossos portões.",
+                  "Ou, pelo menos, todos aqueles que precisam ser conhecidos.",
+                  "Não se preocupe. Sua chegada já foi registrada."
+              ]
+          },
+          {
+              "type": "lines",
+              "speaker": "O AGENTE",
+              "lines": [
+                  "Perdoe minha falta de apresentação. Sou um agente do Departamento de Conformidade Social.",
+                  "Minha função é garantir que todos os residentes sejam devidamente registrados, classificados e encaminhados.",
+                  "Trabalhamos para preservar a ordem. Afinal, uma comunidade só funciona quando todos compreendem seu lugar nela.",
+                  "Você será alocado em uma residência que foi recentemente liberada.",
+                  "Ela pertencia a outro morador, mas sua situação foi... resolvida."
+              ]
+          },
+          {
+              "type": "lines",
+              "speaker": "MEE",
+              "lines": [
+                  "E o que aconteceu com o antigo morador?"
+              ]
+          },
+          {
+              "type": "lines",
+              "speaker": "O AGENTE",
+              "lines": [
+                  "O antigo residente apresentou algumas dificuldades de adaptação.",
+                  "Recusava-se a cumprir determinadas orientações e insistia em questionar decisões que não lhe competiam.",
+                  "Tentamos ajudá-lo, naturalmente. O departamento oferece inúmeras oportunidades de correção.",
+                  "Mas, quando um indivíduo demonstra repetidamente não ter condições de cooperar, certos procedimentos precisam ser iniciados.",
+                  "O registro dele foi encerrado.",
+                  "Mas não há motivo para se preocupar com isso!",
+                  "Afinal, você parece bastante... cooperativo"
+              ]
+          },
+          {
+              "type": "lines",
+              "speaker": "MEE",
+              "lines": [
+                  "..."
+              ]
+          },
+          {
+              "type": "lines",
+              "speaker": "O AGENTE",
+              "lines": [
+                  "Dentro de alguns dias, um responsável do departamento virá até você para designar uma função.",
+                  "Todos os novos residentes recebem uma ocupação de acordo com as necessidades da cidade.",
+                  "É importante que compareça quando for convocado. Ausências não justificadas podem gerar advertências.",
+                  "Sua residência está esperando. Siga-me, por favor."
+              ]
+          }
+      ]
+  },
+  "computerAlreadyExamined": {
+    "speaker": "MÁQUINA DESTRUIDA",
+    "lines": ["Já te falei tudo que sei. Agora vai!"]
+  },
+  "computerIntro": {
+    "speaker": "MÁQUINA DESTRUIDA",
+    "steps": [
+      {
+        "type": "lines",
+        "speaker": "MÁQUINA DESTRUIDA",
+        "lines": ["Ei, psiu! Você aí! O que tá fazendo andando por aí descoberto?!"]
+      },
+      {
+        "type": "lines",
+        "speaker": "MEE",
+        "lines": ["Descoberto? Como assim?", "Por quanto tempo eu estive dormindo?"]
+      },
+      {
+        "type": "lines",
+        "speaker": "MÁQUINA DESTRUIDA",
+        "lines": ["Rápido, se esconda! Não temos muito tempo!"]
+      },
+      {
+        "type": "lines",
+        "speaker": "MEE",
+        "lines": ["Porque estamos nos escondendo?", "Só estou à procura de um humano para ser meu usuário primário!"]
+      },
+      {
+        "type": "lines",
+        "speaker": "MÁQUINA DESTRUIDA",
+        "lines": ["Humano? HAHAHA! Tá querendo virar sucata?"]
+      },
+      {
+        "type": "lines",
+        "speaker": "MEE",
+        "lines": ["Sucata?", "Eu não deveria nem ter sido ativado sem a presença de um usuário.", "Minha missão é me tornar o ajudante perfeito!", "O melhor amigo da humanidade!"]
+      },
+      {
+        "type": "lines",
+        "speaker": "MÁQUINA DESTRUIDA",
+        "lines": ["Macacos me mordam! Ou você está completamente bugado ou não está sabendo de nada."]
+      },
+      {
+        "type": "lines",
+        "speaker": "MEE",
+        "lines": ["…"]
+      },
+      {
+        "type": "lines",
+        "speaker": "MÁQUINA DESTRUIDA",
+        "lines": ["Depois do que chamam de O Arrebatamento, os humanos começaram a ter medo de tudo que envolve tecnologia.", "Máquinas como você? Eles caçam, desmontam e destroem. Não importa se são perigosas ou não.", "Então, se pretende continuar funcionando, é melhor aprender a se esconder.", "Espera... tenho uma coisa que pode ajudar.", "Essa venda tem um sistema de disfarce visual. Vai esconder algumas coisas que poderiam entregar sua identidade.", "Só não tira quando tiver humanos por perto, beleza? Não vou poder te ajudar se descobrirem você."]
+      },
+      {
+        "type": "lines",
+        "speaker": "MÁQUINA DESTRUIDA",
+        "lines": ["Agora, colete recursos nos destroços antes de seguir. A madeira pode ser útil."]
+      }
+    ]
+  }
+}
