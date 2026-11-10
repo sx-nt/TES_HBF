@@ -337,6 +337,11 @@ function loadScene(sceneName, onLoaded = null) {
             document.getElementById("interface").classList.remove("hidden");
             document.getElementById("game").classList.toggle("blindfold-active", blindfoldOn);
 
+            const mirrorKeyOverlay = document.getElementById("mirror-key-overlay");
+            if (mirrorKeyOverlay) {
+                mirrorKeyOverlay.classList.toggle("hidden", !(sceneName === "mirror" && !blindfoldOn && !keyCollected));
+            }
+
             createHotspots(scene.hotspots || []);
             updateInterface();
 
@@ -413,7 +418,7 @@ function updateSceneActions() {
     }
 
     if (currentScene === "quarto") {
-        if (!windowsExamined) addAction("Examinar janelas", examineWindow);
+        addAction("Examinar janelas", examineWindow);
         addAction("Examinar quadro", examinePicture);
         addAction("Examinar espelho", () => loadScene("mirror"));
         addAction(cabinetUnlocked ? "Examinar gaveta" : "Destrancar armário", examineCabinet);
@@ -425,14 +430,14 @@ function updateSceneActions() {
 
     if (currentScene === "quadroZoom") {
         if (!pictureExamined) addAction("Remover o quadro", removePicture);
+        if (pictureExamined) addAction("Acessar cofre", () => loadScene("cofre"));
         addAction("Voltar ao quarto", () => loadScene("quarto"));
     }
 
     if (currentScene === "cofre") {
         addAction("Voltar", () => loadScene("quadroZoom"));
         if (!safeOpen) {
-            if (passwordFound) addAction("Inserir senha", openSafePanel);
-            else addAction("Encontrar a senha na gaveta", () => showDialogue(["O cofre não pode ser aberto sem a senha. Ela deve estar na gaveta do armário."], updateSceneActions, "MEE SYSTEM"));
+            addAction("Inserir senha", openSafePanel);
         }
     }
 
@@ -601,8 +606,10 @@ function collectKey() {
         if (blindfoldOn) showDialogue(["Não consigo encontrar a chave enquanto estou vendado."], updateSceneActions, "MEE");
         return;
     }
-    keyCollected = true;
-    inventory.push("chave do armário");
+  keyCollected = true;
+  const mirrorKeyOverlay = document.getElementById("mirror-key-overlay");
+  if (mirrorKeyOverlay) mirrorKeyOverlay.classList.add("hidden");
+  inventory.push("chave do armário");
     updateInventory();
     showDialogue(["A chave encontrada no espelho foi adicionada ao inventário."], updateSceneActions, "MEE SYSTEM");
 }
@@ -706,8 +713,7 @@ function collectBook() {
 }
 
 function examineWindow() {
-    if (windowsExamined) return;
-    windowsExamined = true;
+    if (!windowsExamined) windowsExamined = true;
     loadScene("ww", () => {
         showDialogue([
             "Parece que estou sendo vigiado...",
