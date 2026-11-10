@@ -46,6 +46,7 @@ button:hover {
     height: 100vh;
 }
 
+
 /* ========================================
    CENÁRIOS
 ======================================== */
@@ -531,6 +532,12 @@ button:hover {
     color: #858585;
     font-size: clamp(10px, 1.4vw, 20px);
     white-space: nowrap;
+}
+
+#subtitulo{
+    color: #7d0707;
+    font-size: clamp(12px, 1.4vw, 20px);
+    padding-bottom: 2%;
 }
 
 /* ========================================
