@@ -22,6 +22,16 @@
 
 #start-screen {
     z-index: 15;
+    background: var(--color-black);
+    color: var(--color-start-text);
+}
+
+/* Arte de fundo em cinza; o vermelho do título fica intacto */
+#start-screen::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
 
     background-image:
         linear-gradient(var(--color-start-dim), var(--color-start-dim)),
@@ -30,7 +40,7 @@
     background-position: center;
     background-repeat: no-repeat;
 
-    color: var(--color-start-text);
+    filter: var(--grayscale-filter);
 }
 
 .start-version,

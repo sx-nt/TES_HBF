@@ -58,6 +58,7 @@
     height: 78px;
     object-fit: contain;
     image-rendering: pixelated;
+    filter: var(--grayscale-filter);
 }
 
 /* Itens que abrem um leitor (documento, livro) */
@@ -77,8 +78,8 @@
 .inventory-item-hint {
     padding: 2px 8px;
     font-size: 10px;
-    color: var(--color-panel-close-bg);
-    background: var(--color-accent);
+    color: var(--color-inventory-hint-text);
+    background: var(--color-inventory-hint-bg);
 }
 
 @media (max-width: 680px) {

@@ -1,86 +1,100 @@
 /* ========================================
    PALETA (todas as cores do jogo)
+   Tons de cinza com detalhes em vermelho.
    Troque os valores aqui para mudar o visual.
 ======================================== */
 
 :root {
+    /* Vermelho (único tom de destaque) */
+    --color-accent-red: #e3262b;          /* bordas, foco, barras, brilho */
+    --color-accent-red-bright: #ff4a4f;   /* texto vermelho sobre fundo escuro */
+    --color-accent-red-dim: #b3161b;      /* fundos vermelhos com texto claro */
+    --color-accent-red-deep: #6e0a0d;     /* fios e detalhes discretos */
+    --color-accent-red-glow: rgba(227, 38, 43, 0.5);
+
+    /* Arte do jogo (cenários, itens, tela inicial) em tons de cinza */
+    --grayscale-filter: grayscale(1) contrast(1.05);
+
     /* Base */
-    --color-bg: #111;
+    --color-bg: #0e0e0e;
     --color-black: #000;
-    --color-text: white;
+    --color-text: #f5f5f5;
     --color-text-bright: #f1f1f1;
-    --color-text-dim: #777;
-    --color-text-muted: #aaa;
+    --color-text-dim: #7a7a7a;
+    --color-text-muted: #ababab;
 
     /* Botões */
-    --color-button-bg: #242424;
-    --color-button-hover: #444;
-    --color-button-border: #aaa;
+    --color-button-bg: #222;
+    --color-button-hover: #3d3d3d;
+    --color-button-border: #9e9e9e;
 
     /* Destaques */
-    --color-accent: #bd9c9c;        /* rótulos, falante, bateria, títulos de painel */
-    --color-danger: #a52d2d;        /* bateria baixa, escolha em foco */
-    --color-error: #e18484;
-    --color-highlight: #d3b37a;     /* foco e objetivo atual */
-    --color-highlight-text: #f1e3c4;
-    --color-highlight-glow: rgba(211, 179, 122, 0.55);
+    --color-accent: var(--color-accent-red-bright);    /* rótulos, falante, títulos de painel */
+    --color-danger: var(--color-accent-red-bright);    /* bateria baixa, escolha em foco */
+    --color-error: #ff6b6f;
+    --color-highlight: var(--color-accent-red-bright); /* foco e objetivo atual */
+    --color-highlight-text: #f5f5f5;
+    --color-highlight-glow: rgba(227, 38, 43, 0.55);
 
     /* Cartões e painéis */
-    --color-border: #777;
+    --color-border: #6e6e6e;
     --color-card-bg: rgba(16, 16, 16, 0.98);
     --color-hud-bg: rgba(10, 10, 10, 0.86);
     --color-backdrop: rgba(0, 0, 0, 0.72);
     --color-backdrop-strong: rgba(0, 0, 0, 0.78);
     --color-shadow: rgba(0, 0, 0, 0.5);
     --color-shadow-strong: rgba(0, 0, 0, 0.7);
-    --color-panel-bg: #2b2b2d;
-    --color-panel-border: #17171a;
-    --color-panel-frame: #55565c;
-    --color-panel-text: #d8d8d8;
-    --color-panel-close-bg: #19191c;
-    --color-slot-bg: #39393f;
-    --color-slot-hover: #45454c;
-    --color-slot-done-bg: #313136;
-    --color-text-done: #77777e;
-    --color-label: #8f8f96;
-    --color-hint-text: #9a9a9a;
-    --color-book-text: #e6dccf;
+    --color-panel-bg: #222;
+    --color-panel-border: #111;
+    --color-panel-frame: #4d4d4d;
+    --color-panel-text: #d9d9d9;
+    --color-panel-close-bg: #161616;
+    --color-slot-bg: #323232;
+    --color-slot-hover: #404040;
+    --color-slot-done-bg: #2b2b2b;
+    --color-text-done: #7c7c7c;
+    --color-label: #949494;
+    --color-hint-text: #9e9e9e;
+    --color-book-text: #e0e0e0;
     --color-toast-bg: rgba(16, 16, 16, 0.94);
 
-    /* HUD */
-    --color-battery-track: #201b1b;
+    /* HUD e inventário */
+    --color-battery-track: #1a1a1a;
+    --color-battery-fill: #d4d4d4;
+    --color-inventory-hint-bg: var(--color-accent-red-dim);
+    --color-inventory-hint-text: #fff;
 
     /* Telas (boot, game over, fim do capítulo) */
-    --color-screen-bg: #101410;
+    --color-screen-bg: #0d0d0d;
     --color-screen-overlay: rgba(0, 0, 0, 0.95);
-    --color-terminal-text: #e72626;
-    --color-terminal-log: #b59e9e;
-    --color-terminal-rule: #6a4545;
-    --color-progress-track: #332929;
-    --color-progress-fill: #ce8c8c;
-    --color-alert-title: #b83232;
+    --color-terminal-text: var(--color-accent-red-bright);
+    --color-terminal-log: #a8a8a8;
+    --color-terminal-rule: var(--color-accent-red-deep);
+    --color-progress-track: #2a2a2a;
+    --color-progress-fill: var(--color-accent-red);
+    --color-alert-title: var(--color-accent-red-bright);
 
     /* Tela inicial */
     --color-start-dim: rgba(0, 0, 0, 0.45);
     --color-start-text: #a5a5a5;
-    --color-start-meta: #858585;
-    --color-brand: #b20e13;
-    --color-brand-hover: #e3262b;
-    --color-brand-glow: rgba(178, 14, 19, 0.5);
-    --color-brand-dark: #7d0707;
+    --color-start-meta: #8a8a8a;
+    --color-brand: #c8161c;
+    --color-brand-hover: var(--color-accent-red);
+    --color-brand-glow: var(--color-accent-red-glow);
+    --color-brand-dark: #8f0c11;
 
     /* Diálogo */
     --color-dialogue-bg: rgba(10, 10, 10, 0.96);
-    --color-mee-speech: #a50707;
-    --color-mee-glow: rgba(230, 168, 168, 0.3);
+    --color-mee-speech: var(--color-accent-red-bright);
+    --color-mee-glow: rgba(227, 38, 43, 0.35);
     --color-choice-bg: #171717;
-    --color-choice-text: #ccc;
+    --color-choice-text: #cfcfcf;
 
     /* Cofre */
-    --color-safe-backdrop: rgba(5, 7, 9, 0.72);
-    --color-safe-bg: #111215;
-    --color-safe-border: #9b7777;
-    --color-input-bg: #08090b;
+    --color-safe-backdrop: rgba(0, 0, 0, 0.72);
+    --color-safe-bg: #111;
+    --color-safe-border: var(--color-accent-red-dim);
+    --color-input-bg: #080808;
 
     /* Efeitos */
     --color-blindfold-tint: rgba(0, 0, 0, 0.38);
