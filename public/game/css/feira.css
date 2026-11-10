@@ -1,23 +1,30 @@
 /* ========================================
    FEIRA DE JOGOS (resgate de tijolinhos no fim do capítulo)
-   Usa apenas as variáveis de cor definidas em base.css.
+   Paleta própria em tons de cinza com detalhes em vermelho.
 ======================================== */
 
 #feira-reward {
+    --feira-bg: #141414;
+    --feira-border: #3a3a3a;
+    --feira-text: #cfcfcf;
+    --feira-muted: #8a8a8a;
+    --feira-red: #e3262b;
+    --feira-red-bright: #ff6b6f;
+    --feira-button: #222;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 12px;
     max-width: 420px;
     padding: 16px 20px;
-    border: 1px solid var(--color-border);
-    background: var(--color-card-bg);
-    box-shadow: 0 0 18px var(--color-shadow);
+    border: 1px solid var(--feira-border);
+    background: var(--feira-bg);
+    box-shadow: 0 0 18px rgba(0, 0, 0, 0.6);
 }
 
 #feira-reward .feira-title {
     margin: 0;
-    color: var(--color-accent);
+    color: var(--feira-red);
     font-size: 12px;
     letter-spacing: 2px;
 }
@@ -28,7 +35,7 @@
 }
 
 #feira-button:disabled:hover {
-    background: var(--color-button-bg);
+    background: var(--feira-button);
 }
 
 #feira-google-button {
@@ -38,14 +45,14 @@
 #feira-status {
     min-height: 1.4em;
     margin: 0;
-    color: var(--color-text-muted);
+    color: var(--feira-muted);
     font-size: 13px;
 }
 
 #feira-status[data-kind="success"] {
-    color: var(--color-text-bright);
+    color: var(--feira-text);
 }
 
 #feira-status[data-kind="error"] {
-    color: var(--color-error);
+    color: var(--feira-red-bright);
 }
