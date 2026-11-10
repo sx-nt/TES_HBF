@@ -1,4 +1,5 @@
 import { getDialogue } from "./data/dialogues.js";
+import { bookPages } from "./data/book.js";
 import {
     playBootSound,
     stopBootSound,
@@ -125,6 +126,7 @@ let cabinetUnlocked = false;
 let passwordFound = false;
 let machineExamined = false;
 let machineZoomActive = false;
+let bookRead = false;
 let battery = 100;
 let objectives = [];
 let isPaused = false;
@@ -301,6 +303,9 @@ machineExamined = false;
   machineZoomActive = false;
   battery = 100;
     resetObjectives();
+    bookRead = false;
+    closeReadingModals();
+    document.getElementById("chapter-end").classList.add("hidden");
     isPaused = false;
     updateInventory();
     updateBattery();
@@ -521,11 +526,18 @@ function updateInventory() {
         "venda": "assets/items/venda.png",
         "madeira": "assets/items/madeira.png",
         "martelo": "assets/items/ferramentas.png",
-        "senha do cofre": "assets/items/chave.png"
+        "documento": "assets/items/id.png"
+    };
+
+    // Itens que podem ser abertos a partir do inventário
+    const openableItems = {
+        "documento": { hint: "Abrir", action: openDocumentViewer },
+        "livro": { hint: "Ler", action: openBookReader }
     };
 
     inventory.forEach((item) => {
-        const card = document.createElement("div");
+        const openable = openableItems[item];
+        const card = document.createElement(openable ? "button" : "div");
         card.className = "inventory-item";
 
         const image = document.createElement("img");
@@ -536,6 +548,20 @@ function updateInventory() {
         label.textContent = item.toUpperCase();
 
         card.append(image, label);
+
+        if (openable) {
+            card.type = "button";
+            card.classList.add("inventory-item-openable");
+            card.setAttribute("aria-label", `${openable.hint} ${item}`);
+
+            const hint = document.createElement("small");
+            hint.className = "inventory-item-hint";
+            hint.textContent = openable.hint;
+            card.appendChild(hint);
+
+            card.addEventListener("click", openable.action);
+        }
+
         itemsEl.appendChild(card);
     });
 }
@@ -574,7 +600,7 @@ function saveGame() {
         blindfoldOn, hasBlindfold, computerExamined, debrisExamined, inventory,
         gatesReady, toolsExamined, hasHammer, hasNails, windowsExamined, windowsCovered,
         pictureExamined, safeOpen, bookCollected, keyCollected, cabinetUnlocked,
-        passwordFound, machineExamined, machineZoomActive, battery, currentScene,
+        passwordFound, machineExamined, machineZoomActive, bookRead, battery, currentScene,
         objectives
     };
     localStorage.setItem("mee-save", JSON.stringify(saveState));
@@ -732,9 +758,12 @@ function examineCabinet() {
 
     if (!passwordFound) {
         passwordFound = true;
-        inventory.push("senha do cofre");
+        inventory.push("documento");
         updateInventory();
-        showDialogue(["A gaveta foi aberta. Parece que há um documento ai dentro"], updateSceneActions, "MEE SYSTEM");
+        showDialogue([
+            "A gaveta foi aberta.",
+            "Há um documento dentro da gaveta. Talvez eu deva examiná-lo no inventário."
+        ], withObjective("examinar-documento", "Examine o documento no inventário", updateSceneActions), "MEE SYSTEM");
     } else {
         showDialogue(["Parece que já examinei essa gaveta"], updateSceneActions, "MEE");
     }
@@ -792,7 +821,7 @@ function closeSafePanel() {
 function submitSafeCode() {
     const input = document.getElementById("safe-code");
     const feedback = document.getElementById("safe-feedback");
-    if (input.value.trim() !== "03030") {
+    if (input.value.trim() !== "030330") {
         feedback.textContent = "SENHA INCORRETA";
         feedback.className = "safe-feedback error";
         return;
@@ -963,6 +992,128 @@ function toggleObjectives() {
     button.setAttribute("aria-expanded", String(!isOpen));
     button.classList.remove("objective-pulse");
 }
+// DOCUMENTOS E LIVRO
+
+let bookPageIndex = 0;
+let bookReachedEnd = false;
+let readingReturnFocus = null;
+
+function isModalOpen(id) {
+    return !document.getElementById(id).classList.contains("hidden");
+}
+
+function openReadingModal(id, focusId) {
+    readingReturnFocus = document.activeElement;
+    document.getElementById(id).classList.remove("hidden");
+    document.getElementById(focusId).focus();
+}
+
+function closeReadingModal(id) {
+    document.getElementById(id).classList.add("hidden");
+
+    if (readingReturnFocus && document.body.contains(readingReturnFocus)) {
+        readingReturnFocus.focus();
+    }
+    readingReturnFocus = null;
+}
+
+// Fecha os leitores sem disparar efeitos (usado ao iniciar/reiniciar)
+function closeReadingModals() {
+    document.getElementById("document-viewer").classList.add("hidden");
+    document.getElementById("book-reader").classList.add("hidden");
+    readingReturnFocus = null;
+}
+
+function openDocumentViewer() {
+    openReadingModal("document-viewer", "document-close");
+}
+
+function closeDocumentViewer() {
+    closeReadingModal("document-viewer");
+}
+
+function openBookReader() {
+    bookPageIndex = 0;
+    bookReachedEnd = false;
+    renderBookPage();
+    openReadingModal("book-reader", "book-next");
+}
+
+function renderBookPage() {
+    const page = bookPages[bookPageIndex];
+    const isLast = bookPageIndex === bookPages.length - 1;
+
+    if (isLast) bookReachedEnd = true;
+
+    document.getElementById("book-page-title").textContent = page.title || "";
+    document.getElementById("book-page-text").textContent = page.text;
+    document.getElementById("book-page-counter").textContent =
+        `${bookPageIndex + 1}/${bookPages.length}`;
+
+    document.getElementById("book-prev").disabled = bookPageIndex === 0;
+
+    const next = document.getElementById("book-next");
+    const finish = document.getElementById("book-finish");
+    next.classList.toggle("hidden", isLast);
+    finish.classList.toggle("hidden", !isLast);
+
+    // Mantém o foco num botão visível ao trocar Próxima por Fechar livro
+    if (isLast && document.activeElement === next) finish.focus();
+}
+
+function changeBookPage(delta) {
+    const target = bookPageIndex + delta;
+    if (target < 0 || target >= bookPages.length) return;
+    bookPageIndex = target;
+    renderBookPage();
+}
+
+function closeBookReader() {
+    if (!isModalOpen("book-reader")) return;
+
+    closeReadingModal("book-reader");
+
+    // Ler o livro inteiro pela primeira vez encerra o capítulo
+    if (bookReachedEnd && !bookRead) {
+        bookRead = true;
+        showChapterEnd();
+    }
+}
+
+function showChapterEnd() {
+    closeReadingModals();
+    completeObjective("ler-livro");
+    document.getElementById("inventory").classList.add("hidden");
+    document.getElementById("inventory-toggle").setAttribute("aria-expanded", "false");
+    document.getElementById("interface").classList.add("hidden");
+    document.getElementById("dialogue").classList.add("hidden");
+    document.getElementById("game").classList.remove("dialogue-active");
+    document.getElementById("chapter-end").classList.remove("hidden");
+    document.getElementById("chapter-end-restart").focus();
+}
+
+document.addEventListener("keydown", (event) => {
+    if (isModalOpen("document-viewer")) {
+        if (event.key === "Escape") {
+            event.preventDefault();
+            closeDocumentViewer();
+        }
+        return;
+    }
+
+    if (isModalOpen("book-reader")) {
+        if (event.key === "Escape") {
+            event.preventDefault();
+            closeBookReader();
+        } else if (event.key === "ArrowLeft") {
+            event.preventDefault();
+            changeBookPage(-1);
+        } else if (event.key === "ArrowRight") {
+            event.preventDefault();
+            changeBookPage(1);
+        }
+    }
+});
 
 // MECÂNICA DA VENDA
 
@@ -1364,6 +1515,9 @@ machineExamined = false;
   machineZoomActive = false;
   battery = 100;
     resetObjectives();
+    bookRead = false;
+    closeReadingModals();
+    document.getElementById("chapter-end").classList.add("hidden");
     isPaused = false;
     document.getElementById("top-hud").classList.add("hidden");
     document.getElementById("pause-menu").classList.add("hidden");
@@ -1397,6 +1551,12 @@ document.getElementById("start-button").addEventListener("click", () => {
 });
 
 document.getElementById("restart-button").addEventListener("click", restartGame);
+document.getElementById("document-close").addEventListener("click", closeDocumentViewer);
+document.getElementById("book-close").addEventListener("click", closeBookReader);
+document.getElementById("book-finish").addEventListener("click", closeBookReader);
+document.getElementById("book-prev").addEventListener("click", () => changeBookPage(-1));
+document.getElementById("book-next").addEventListener("click", () => changeBookPage(1));
+document.getElementById("chapter-end-restart").addEventListener("click", restartGame);
 document.getElementById("safe-cancel").addEventListener("click", closeSafePanel);
 document.getElementById("safe-submit").addEventListener("click", submitSafeCode);
 document.getElementById("safe-code").addEventListener("keydown", (event) => {
