@@ -81,7 +81,12 @@ export function toggleInventory() {
     $("inventory-toggle").setAttribute("aria-expanded", String(!isOpen));
 }
 
+// Retorna true se o painel estava aberto (usado pelo Esc em main.js)
 export function closeInventory() {
-    $("inventory").classList.add("hidden");
+    const panel = $("inventory");
+    const wasOpen = !panel.classList.contains("hidden");
+
+    panel.classList.add("hidden");
     $("inventory-toggle").setAttribute("aria-expanded", "false");
+    return wasOpen;
 }

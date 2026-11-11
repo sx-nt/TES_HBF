@@ -1,13 +1,14 @@
 // PONTO DE ENTRADA: conecta os módulos e registra os eventos da página.
 import { $ } from "./core/utils.js";
-import { setupUiSounds } from "./core/audio.js";
+import { setupUiSounds, playUiSound } from "./core/audio.js";
+import { state } from "./core/state.js";
 import { SAFE_CODE } from "./data/scenes.js";
 import { skipTyping } from "./ui/dialogue.js";
 import { crtTransition } from "./ui/transitions.js";
-import { initObjectives } from "./ui/objectives.js";
+import { initObjectives, closeObjectives } from "./ui/objectives.js";
 import { initNotifications } from "./ui/notifications.js";
 import { togglePause, saveGame, updateBlindfoldButton } from "./ui/hud.js";
-import { setOpenableItems, toggleInventory } from "./ui/inventory.js";
+import { setOpenableItems, toggleInventory, closeInventory } from "./ui/inventory.js";
 import { initReaders, openDocumentViewer, openBookReader } from "./ui/readers.js";
 import { initSafePanel } from "./ui/safe.js";
 import { setSceneUIRenderer } from "./game/scene-loader.js";
@@ -66,6 +67,27 @@ document.addEventListener("keydown", (event) => {
     if (skipTyping()) return;
     skipBoot();
 });
+
+// Esc: fecha uma camada por vez, da mais alta para a mais baixa.
+// Leitores (documento/livro) e o painel do cofre tratam o próprio Esc;
+// aqui ficam a pausa e, abaixo dela, o inventário e os objetivos.
+const SELF_CLOSING_LAYERS = ["document-viewer", "book-reader", "safe-panel"];
+
+document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
+    if (SELF_CLOSING_LAYERS.some(id => !$(id).classList.contains("hidden"))) return;
+
+    if (state.isPaused) {
+        event.preventDefault();
+        togglePause();
+        return;
+    }
+
+    if (closeInventory() || closeObjectives()) {
+        event.preventDefault();
+        playUiSound("popupClose");
+    }
+}, true); // captura: decide antes dos handlers que fecham os leitores e o cofre
 
 // API mínima para a camada HTML e para futuras telas de menu.
 window.startBoot = boot;
