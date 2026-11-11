@@ -21,19 +21,19 @@ const SCENE_ACTIONS = {
     ],
 
     houseFront: (s) => [
-        !s.toolsExamined && ["Examinar ferramentas", examineTools],
         s.toolsExamined && (!s.hasHammer || !s.hasNails) && ["Coletar ferramentas", collectTools],
-        ["Entrar na casa", go("quarto")]
+        ["Entrar na casa", go("quarto")],
+        !s.toolsExamined && ["Examinar ferramentas", examineTools]
     ],
 
     quarto: (s) => [
-        !s.windowsCovered && ["Examinar janelas", examineWindow],
         ["Examinar quadro", examinePicture],
         ["Examinar espelho", go("mirror")],
         ["Examinar armário", examineCabinet],
         s.windowsCovered && !s.blindfoldOn && s.hasHammer && s.hasNails &&
             ["Ir para a construção", go("construcao")],
-        ["Voltar aos portões", returnToGates]
+        ["Voltar aos portões", returnToGates],
+        !s.windowsCovered && ["Examinar janelas", examineWindow]
     ],
 
     quadroZoom: (s) => [
