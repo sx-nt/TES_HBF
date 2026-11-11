@@ -51,6 +51,14 @@
     align-self: flex-end;
 }
 
+/* Com opções de resposta, a caixa cresce para caber todos os botões */
+#dialogue:has(#dialogue-choices:not(.hidden)) {
+    height: auto;
+    min-height: 156px;
+    max-height: calc(100% - 48px);
+    overflow-y: auto;
+}
+
 #dialogue-choices {
     display: flex;
     flex-direction: column;
