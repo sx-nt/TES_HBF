@@ -119,9 +119,14 @@ function toggleObjectives() {
     }
 }
 
+// Retorna true se o painel estava aberto (usado pelo Esc em main.js)
 export function closeObjectives() {
-    byId("objectives")?.classList.add("hidden");
+    const panel = byId("objectives");
+    const wasOpen = Boolean(panel && !panel.classList.contains("hidden"));
+
+    panel?.classList.add("hidden");
     byId("objectives-toggle")?.setAttribute("aria-expanded", "false");
+    return wasOpen;
 }
 
 export function initObjectives() {
