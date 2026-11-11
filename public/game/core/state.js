@@ -17,6 +17,7 @@ function createInitialState() {
 
         // Portões e frente da casa
         gatesReady: false,
+        warnings: 0, // advertências do Agente ao voltar aos portões
         toolsExamined: false,
         hasHammer: false,
         hasNails: false,

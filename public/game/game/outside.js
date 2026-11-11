@@ -8,6 +8,7 @@ import { addItem, hasItem } from "../ui/inventory.js";
 import { updateBattery } from "../ui/hud.js";
 import { loadScene, refreshSceneUI, swapBackground } from "./scene-loader.js";
 import { leaveHouse, dialogueActions } from "./blindfold.js";
+import { startInterrogation, eliminatePlayer } from "./interrogation.js";
 
 const WOOD_BATTERY_COST = 5;
 
@@ -83,16 +84,37 @@ function startGatesSequence() {
     }, incoming.speaker);
 }
 
+// Cada volta aos portões (com a venda) conta como uma advertência:
+// 1ª e 2ª: aviso; 3ª: interrogatório; depois disso: eliminação.
+const INTERROGATION_WARNING = 3;
+
+function offerReturnHome() {
+    showChoiceDialogue("O Agente aguarda que você volte para casa.", [
+        { label: "Voltar para casa", action: () => loadScene("houseFront") }
+    ], "MEE SYSTEM");
+}
+
+function warnPlayer() {
+    const warning = getDialogue(state.warnings === 1 ? "officerWarning" : "officerWarning2");
+    showDialogue(warning.lines, withObjective(
+        "ficar-em-casa", "Volte para casa e não saia sem motivo", offerReturnHome
+    ), warning.speaker);
+}
+
 export function returnToGates() {
     leaveHouse("gates", () => {
+        state.warnings++;
+
         swapBackground(GATES_OFFICER_IMAGE, () => {
-            const warning = getDialogue("officerWarning");
-            showDialogue(warning.lines, () => {
-                setObjective("ficar-em-casa", "Volte para casa e não saia sem motivo");
-                showChoiceDialogue("O Agente aguarda que você volte para casa.", [
-                    { label: "Voltar para casa", action: () => loadScene("houseFront") }
-                ], "MEE SYSTEM");
-            }, warning.speaker);
+            if (state.warnings < INTERROGATION_WARNING) {
+                warnPlayer();
+            } else if (state.warnings === INTERROGATION_WARNING) {
+                startInterrogation(withObjective(
+                    "nao-voltar-portoes", "Não volte aos portões", offerReturnHome
+                ));
+            } else {
+                eliminatePlayer(getDialogue("officerElimination").lines);
+            }
         });
     });
 }
