@@ -36,6 +36,7 @@ export function startGame() {
     resetState();
     resetObjectives();
     resetFeira();
+    setGameOverText();
 
     hideScreens("start-screen", "boot-screen", "game-over", "chapter-end", "scene", "interface");
     $("game").classList.remove("blindfold-active");
@@ -59,7 +60,17 @@ export function restartGame() {
 
 // GAME OVER
 // Bloqueia toda a interação até o jogador reiniciar.
-export function gameOver() {
+// message (opcional) substitui o texto padrão da tela de game over.
+let defaultGameOverText = null;
+
+function setGameOverText(message = null) {
+    const text = $("game-over").querySelector("p");
+    if (!text) return;
+    if (defaultGameOverText === null) defaultGameOverText = text.textContent;
+    text.textContent = message || defaultGameOverText;
+}
+
+export function gameOver(message = null) {
     if (state.isGameOver) return;
 
     interruptGameplay();
@@ -69,6 +80,7 @@ export function gameOver() {
     hideScreens("interface");
     pauseBackgroundMusic();
 
+    setGameOverText(message);
     $("game-over").classList.remove("hidden");
     $("restart-button").focus();
 }

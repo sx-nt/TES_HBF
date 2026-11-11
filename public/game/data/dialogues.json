@@ -74,6 +74,60 @@
     "speaker": "O AGENTE",
     "lines": ["Ei! Você não deveria estar aqui fora.", "Volte para casa e não saia sem motivo."]
   },
+  "officerWarning2": {
+    "speaker": "O AGENTE",
+    "lines": ["Você de novo?", "Eu já disse uma vez. Não costumo repetir orientações.", "Volte para casa. Agora. Esta é sua segunda advertência."]
+  },
+  "officerInterrogation": {
+    "speaker": "O AGENTE",
+    "intro": [
+      "Três advertências em tão pouco tempo...",
+      "Residentes cooperativos não ficam rondando os portões.",
+      "Antes de voltar para casa, você vai responder algumas perguntas.",
+      "Pense bem. O Departamento valoriza respostas sinceras."
+    ],
+    "questions": [
+      {
+        "question": "Por que você continua saindo de casa?",
+        "answers": [
+          { "label": "Fiquei inquieto lá dentro. A casa ainda não parece minha.", "suspicious": false, "reply": "Hm. Adaptação leva tempo. Para alguns." },
+          { "label": "Ainda estou procurando meu caminho pela cidade. Me desculpe.", "suspicious": false, "reply": "A cidade não é sua para explorar. Lembre-se disso." },
+          { "label": "Procuro um usuário primário a quem servir.", "suspicious": true, "reply": "Um... usuário primário? Que tipo de gente fala assim?" }
+        ]
+      },
+      {
+        "question": "De onde você veio antes de chegar aos nossos portões?",
+        "answers": [
+          { "label": "Fui ativado na praia há 3 dias, 4 horas e 12 minutos.", "suspicious": true, "reply": "Ativado? Com essa precisão? Ninguém conta o tempo desse jeito." },
+          { "label": "Não gosto de falar sobre isso. Perdi muita coisa no caminho.", "suspicious": false, "reply": "Todos perderam alguma coisa. Isso não te torna especial." },
+          { "label": "Da costa. Andei dias pela praia até encontrar a cidade.", "suspicious": false, "reply": "A praia. Muitos chegam por lá. Poucos ficam." }
+        ]
+      },
+      {
+        "question": "E por que essa venda? Nunca a tira, nem para falar comigo.",
+        "answers": [
+          { "label": "Machuquei os olhos na viagem. A luz ainda incomoda.", "suspicious": false, "reply": "Conveniente. Mas aceitável." },
+          { "label": "Ela oculta componentes que poderiam revelar minha identidade.", "suspicious": true, "reply": "Componentes? ... Repita isso." },
+          { "label": "Promessa a alguém que ficou para trás. Prefiro não explicar.", "suspicious": false, "reply": "Sentimental. O Departamento não se importa com promessas." }
+        ]
+      }
+    ],
+    "rejection": [
+      "Não. Não gostei dessa resposta.",
+      "O Departamento já lidou com gente como você antes.",
+      "Seu registro está encerrado."
+    ],
+    "release": [
+      "...",
+      "Suas respostas são aceitáveis. Por enquanto.",
+      "Esta é a última vez que te vejo aqui fora antes da convocação.",
+      "Na próxima, não haverá perguntas. Volte para casa."
+    ]
+  },
+  "officerElimination": {
+    "speaker": "O AGENTE",
+    "lines": ["Eu avisei que não haveria uma próxima vez.", "O antigo morador também achava que podia ignorar as orientações.", "Seu registro está encerrado."]
+  },
   "windowWatchWarning": {
     "speaker": "MEE SYSTEM",
     "lines": ["ALERTA: Você está sendo observado pela janela.", "Não é seguro retirar a venda."]
